@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.66.0](https://github.com/dryvist/mlx-benchmarks/compare/v0.65.0...v0.66.0) (2026-11-02)
+
+
+### Features
+
+* **lm-eval:** split quick intelligence into sample slices ([#502](https://github.com/dryvist/mlx-benchmarks/issues/502)) ([b8aa2af](https://github.com/dryvist/mlx-benchmarks/commit/b8aa2aff596899a1df51632fc5e45af3ba03bfd5))
+
 ## [0.65.0](https://github.com/dryvist/mlx-benchmarks/compare/v0.64.0...v0.65.0) (2026-10-31)
 
 
