@@ -60,6 +60,7 @@ PLACEHOLDERS = {
     "concurrency",
     "repetition",
     "output_tokens",
+    "sample_slice",
     "result_dir",
     "result_filename",
     "result_path",
@@ -129,7 +130,7 @@ def test_run_names_are_unique_within_a_recipe(name: str) -> None:
 def test_run_declares_the_dispatch_fields(name: str, run: dict[str, Any]) -> None:
     assert run["artifact_id"] == "selected_model"
     assert run["run_on"] in {"benchmark_target", "controller"}
-    assert set(run["dimensions"]) <= {"context_list", "concurrency_list"}
+    assert set(run["dimensions"]) <= {"context_list", "concurrency_list", "sample_slice_list"}
     assert isinstance(run["repetitions"], int) and run["repetitions"] >= 1
     assert isinstance(run["output_tokens"], int) and run["output_tokens"] > 0
     assert isinstance(run["executable"], str) and run["executable"]
@@ -160,6 +161,22 @@ def test_axis_placeholders_are_declared_dimensions(name: str, run: dict[str, Any
         assert "context_list" in run["dimensions"] or run.get("prompt_tokens", 0) > 0
     if "{{ concurrency }}" in argv:
         assert "concurrency_list" in run["dimensions"]
+    if "{{ sample_slice }}" in argv:
+        assert "sample_slice_list" in run["dimensions"]
+
+
+def test_quick_intelligence_declares_one_sample_list_and_a_slice_dimension() -> None:
+    recipe = RECIPES["lm-eval/quick-intelligence"]
+    (run,) = recipe["run"]
+    config_text = (CONFIGS / "lm-eval" / "quick-intelligence.toml").read_text()
+
+    assert run["sample_task"] == _argument_after(run, "--tasks")
+    assert len(run["sample_indices"]) == 420
+    assert len(set(run["sample_indices"])) == 420
+    assert run["slice_size"] == 30
+    assert "sample_slice_list" in run["dimensions"]
+    assert _argument_after(run, "--samples") == "{{ sample_slice }}"
+    assert config_text.count("sample_indices = [") == 1
 
 
 @pytest.mark.parametrize(("name", "run"), CONVERTED_RUNS, ids=CONVERTED_RUN_IDS)

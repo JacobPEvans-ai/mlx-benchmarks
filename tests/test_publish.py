@@ -63,6 +63,19 @@ def test_target_path_includes_payload_hash(valid_envelope: dict) -> None:
     assert stamped_a.startswith(bare.removesuffix(".parquet"))
 
 
+def test_sample_slice_cells_publish_to_distinct_paths(valid_envelope: dict) -> None:
+    paths = []
+    for sample_slice_index in (0, 1):
+        envelope = {
+            **valid_envelope,
+            "campaign_dimensions": {"run": {"sample_slice_index": sample_slice_index}},
+        }
+        payload = rows_to_parquet(envelope_to_rows(envelope))
+        paths.append(target_path(envelope, payload=payload))
+
+    assert paths[0] != paths[1]
+
+
 def test_envelope_to_rows_explodes_results(valid_envelope: dict) -> None:
     rows = envelope_to_rows(valid_envelope)
     assert len(rows) == len(valid_envelope["results"])

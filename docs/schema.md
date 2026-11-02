@@ -87,6 +87,10 @@ The optional `campaign_dimensions.run.moe_cpu_offload` field records `none`,
 number of model layers covered by CPU expert offload; use `0` for `none` and
 the full model layer count for `cpumoe`.
 
+`campaign_dimensions.run.sample_slice_index` identifies the sample-slice cell
+within its recipe and is flattened to the stable
+`campaign_run_sample_slice_index` column.
+
 Converters keep both objects. `mlx-bench-publish --campaign-dimensions PATH`
 reads a JSON file with a `campaign_dimensions` object and an optional
 `dimension_null_reasons` object and copies them onto the envelope for every
