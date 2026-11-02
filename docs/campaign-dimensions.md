@@ -41,6 +41,10 @@ normalized with nulls for all new columns, so every file has the same schema.
 - **provenance:** UTC timestamp; run ID; config name/SHA; operator/agent; raw output path; schema version.
 - **cost:** kWh and local electricity cost per million output tokens; median rental and API cost per million.
 
+`campaign_dimensions.run.sample_slice_index` identifies the sample-slice cell
+within its recipe and is flattened to the stable
+`campaign_run_sample_slice_index` Parquet column.
+
 ## Optional power enrichment
 
 Set `MLX_BENCH_METRICS_URL` to a Prometheus or VictoriaMetrics base URL. Paths
