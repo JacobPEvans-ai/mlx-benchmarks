@@ -27,7 +27,7 @@ normalized with nulls for all new columns, so every file has the same schema.
 - **run:** allocated context; KV dtype; prompt/depth/output tokens; concurrency;
   batch/ubatch; parallel slots; prefix cache; speculative/MTP; draft model;
   temperature; thinking; chat template; seed; repeats; warm/cold state; cell
-  start/end; applied patches; `knob_case` and structured `knobs`; sampling mode;
+  sample-slice index; start/end; applied patches; `knob_case` and structured `knobs`; sampling mode;
   requested/measured output tokens; speculative-token count; KV-pool tokens;
   max running requests; PLE offload target; model load time.
 - **speed:** TTFT p50/p90/p99; prefill/decode/aggregate/total throughput;
@@ -40,6 +40,10 @@ normalized with nulls for all new columns, so every file has the same schema.
 - **quality:** benchmark/version/subset/sample count; score; standard error and confidence interval; judge model; contamination note.
 - **provenance:** UTC timestamp; run ID; config name/SHA; operator/agent; raw output path; schema version.
 - **cost:** kWh and local electricity cost per million output tokens; median rental and API cost per million.
+
+`campaign_dimensions.run.sample_slice_index` identifies the sample-slice cell
+within its recipe and is flattened to the stable
+`campaign_run_sample_slice_index` Parquet column.
 
 ## Optional power enrichment
 

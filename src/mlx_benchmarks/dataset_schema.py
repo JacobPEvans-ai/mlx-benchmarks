@@ -271,6 +271,7 @@ CAMPAIGN_DIMENSION_TYPES = {
         "chat_template": pa.string(),
         "seed": pa.int64(),
         "repeats": pa.int64(),
+        "sample_slice_index": pa.int64(),
         "warm_cold": pa.string(),
         "started_at": pa.string(),
         "ended_at": pa.string(),

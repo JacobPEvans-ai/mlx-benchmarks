@@ -26,7 +26,7 @@ DIMENSIONS: dict[str, Any] = {
     "hardware": {"machine": "Example GPU", "power_cap_w": 300.0, "ups_circuit": None},
     "software": {"engine": "vLLM", "engine_version": "0.30.0", "backend": "CUDA"},
     "model": {"hf_repo": "example/model", "quantization": "NVFP4", "revision_sha": None},
-    "run": {"concurrent_agents": 4, "allocated_context_tokens": 196608},
+    "run": {"concurrent_agents": 4, "allocated_context_tokens": 196608, "sample_slice_index": 3},
     "quality": {"benchmark_name": None, "score": None},
 }
 NULL_REASONS = {
@@ -196,6 +196,7 @@ def test_converter_dimensions_reach_the_published_rows(vllm_sample: dict) -> Non
         assert row["campaign_hardware_machine"] == "Example GPU"
         assert row["campaign_hardware_power_cap_w"] == 300.0
         assert row["campaign_run_concurrent_agents"] == 4
+        assert row["campaign_run_sample_slice_index"] == 3
         assert row["campaign_hardware_ups_circuit"] is None
         reasons = json.loads(row["campaign_dimension_null_reasons_json"])
         assert {key: reasons[key] for key in NULL_REASONS} == NULL_REASONS

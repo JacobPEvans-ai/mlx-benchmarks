@@ -53,7 +53,14 @@ repos:
         types: [python]
       - id: pytest
         name: pytest (from .venv, pre-push only)
-        entry: .venv/bin/pytest
+        # Git exports its repository context to hooks; pytest's fixtures create
+        # temporary repositories and must run outside that context. Clear proxy
+        # detection for this test process as well.
+        entry: >-
+          env -u ALL_PROXY -u all_proxy -u HTTPS_PROXY -u HTTP_PROXY
+          -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_COMMON_DIR
+          -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_PREFIX
+          .venv/bin/pytest
         language: system
         pass_filenames: false
         always_run: true
