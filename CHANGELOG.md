@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.68.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.67.0...v0.68.0) (2026-11-11)
+
+
+### Features
+
+* **publish:** publish committed envelopes from CI ([#512](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/512)) ([3cab766](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/3cab766fce64ee71387441c17127ec911183200d))
+
 ## [0.67.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.66.0...v0.67.0) (2026-11-11)
 
 
