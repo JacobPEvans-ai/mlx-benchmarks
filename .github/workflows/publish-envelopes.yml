@@ -1,0 +1,54 @@
+# Publish committed envelopes to the HF dataset.
+#
+# Each run directory under published/pending holds envelope.json and
+# metadata.json. Every complete pair is published by mlx-bench-publish-envelope.
+# The job only runs from main, so the write token is never exposed to another ref.
+
+name: Publish Envelopes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "published/pending/**.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-envelopes
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish pending envelopes
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: pyproject.toml
+      - name: Publish pending envelopes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN_WRITE_ALL }}
+        run: |
+          set -euo pipefail
+          pairs=()
+          while IFS= read -r envelope; do
+            metadata="$(dirname "$envelope")/metadata.json"
+            if [ -f "$metadata" ]; then
+              pairs+=(--pair "$envelope" "$metadata")
+            fi
+          done < <(find published/pending -mindepth 2 -maxdepth 2 -name envelope.json | sort)
+          if [ "${#pairs[@]}" -eq 0 ]; then
+            echo "No published/pending/*/envelope.json with a sibling metadata.json; nothing to publish."
+            exit 0
+          fi
+          uv run mlx-bench-publish-envelope "${pairs[@]}"
