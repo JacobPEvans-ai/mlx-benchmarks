@@ -1,6 +1,6 @@
 [project]
 name = "mlx-benchmarks"
-version = "0.68.0"  # x-release-please-version
+version = "0.69.0"  # x-release-please-version
 description = "Benchmark harness for MLX-quantized LLMs on Apple Silicon — envelope v1 + HF dataset publisher"
 readme = "README.md"
 license = { file = "LICENSE" }
