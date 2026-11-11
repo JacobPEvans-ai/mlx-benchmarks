@@ -1,0 +1,3 @@
+,document_category,document_set_id,question_id,question,answer,data_source_filenames,data_source_urls,input_tokens
+0,Company_Documents,fake_set_a,1,"Which fund reported higher net revenue in 2024, and what was it in millions?",Fund Beta: 71 million,fund_alpha_2024.txt;fund_beta_2024.txt,,
+1,Marketing,fake_set_b,2,What spring launch budget does the campaign memo recommend?,250000 dollars,campaign_notes.txt,,
