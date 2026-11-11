@@ -60,6 +60,7 @@ mlx-bench-events = "mlx_benchmarks.events:main"
 mlx-bench-shootout = "mlx_benchmarks.shootout:main"
 mlx-bench-validate-results = "mlx_benchmarks.result_contract:main"
 mlx-bench-publish-backfill = "mlx_benchmarks.backfill:main"
+mlx-bench-publish-envelope = "mlx_benchmarks.publish_envelope:main"
 
 [project.urls]
 Homepage = "https://github.com/JacobPEvans/mlx-benchmarks"
