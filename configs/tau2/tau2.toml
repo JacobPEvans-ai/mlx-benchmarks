@@ -31,9 +31,9 @@ command = """
 tau2 run \
   --domain $DOMAIN \
   --agent-llm openai/$MODEL \
-  --agent-llm-args '{"api_base": "$BASE_URL", "api_key": "none", "temperature": 0.0}' \
+  --agent-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
   --user-llm $USER_LLM \
-  --user-llm-args '{"api_base": "$BASE_URL", "api_key": "none", "temperature": 0.0}' \
+  --user-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
   --num-trials $NUM_TRIALS \
   --save-to $RUN_NAME
 """
@@ -44,9 +44,9 @@ command = """
 tau2 run \
   --domain $DOMAIN \
   --agent-llm openai/$MODEL \
-  --agent-llm-args '{"api_base": "$BASE_URL", "api_key": "none", "temperature": 0.0}' \
+  --agent-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
   --user-llm $USER_LLM \
-  --user-llm-args '{"api_base": "$BASE_URL", "api_key": "none", "temperature": 0.0}' \
+  --user-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
   --num-tasks 3 \
   --num-trials 1 \
   --save-to $RUN_NAME-smoke

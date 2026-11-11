@@ -34,7 +34,11 @@ _SUCCESS_TOLERANCE = 1e-6
 _INFRASTRUCTURE_ERROR = "infrastructure_error"
 # Endpoint and credential keys an operator passes in --agent-llm-args or
 # --user-llm-args. They are never published.
-_WITHHELD_LLM_ARG_KEYS = frozenset({"api_key", "api_base"})
+# Only scalar sampling settings are published; every other llm_args key (keys, endpoints,
+# headers, nested objects) is dropped.
+_PUBLIC_LLM_ARG_KEYS = frozenset(
+    {"temperature", "top_p", "top_k", "max_tokens", "max_completion_tokens", "seed", "reasoning_effort"}
+)
 _NAIVE_TIMESTAMP_NOTE = (
     "tau2 recorded a timestamp with no UTC offset; it was read as the publishing host's local "
     "time and stored as UTC. Pass --timestamp to state the run time explicitly."
@@ -180,7 +184,11 @@ def _llm_args(block: dict[str, Any]) -> str:
         return "unstated"
     if not isinstance(args, dict):
         raise ValueError("tau2 llm_args must be an object")
-    public = {key: value for key, value in args.items() if key not in _WITHHELD_LLM_ARG_KEYS}
+    public = {
+        key: value
+        for key, value in args.items()
+        if key in _PUBLIC_LLM_ARG_KEYS and (value is None or isinstance(value, (str, int, float, bool)))
+    }
     return json.dumps(public, sort_keys=True)
 
 

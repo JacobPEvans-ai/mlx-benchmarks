@@ -215,6 +215,24 @@ def test_llm_args_keep_settings_and_drop_endpoint_and_key(tau2_results_sample: d
     assert "llm.example.invalid" not in published
 
 
+def test_llm_args_drop_nested_keys_headers_and_base_url(tau2_results_sample: dict[str, Any]) -> None:
+    raw = copy.deepcopy(tau2_results_sample)
+    raw["info"]["agent_info"]["llm_args"] = {
+        "temperature": 0.0,
+        "base_url": "https://llm.example.invalid/v1",
+        "extra_headers": {"Authorization": "Bearer example-secret"},
+        "extra_body": {"api_key": "example-secret"},
+        "seed": {"api_key": "example-secret"},
+    }
+    envelope = Tau2Converter().build_envelope(raw, _ctx())
+
+    tags = _one(envelope, "pass_1_sim_mean")["tags"]
+    assert json.loads(tags["agent_llm_args"]) == {"temperature": 0.0}
+    published = json.dumps(envelope)
+    assert "example-secret" not in published
+    assert "llm.example.invalid" not in published
+
+
 def test_absent_llm_args_are_marked_unstated(tau2_results_sample: dict[str, Any]) -> None:
     raw = copy.deepcopy(tau2_results_sample)
     del raw["info"]["agent_info"]["llm_args"]

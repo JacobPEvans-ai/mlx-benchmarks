@@ -15,7 +15,7 @@ converter is [`converters/tau2.py`](../src/mlx_benchmarks/converters/tau2.py), w
 
 One `results.json` covers one domain. A text run takes exactly one domain, so one
 file becomes one envelope. Every row has `name = tau2_bench` and carries the
-run's `domain`, `num_trials`, `n_tasks`, and the agent and user models. The
+run's `tau2_domain`, `num_trials`, `n_tasks`, and the agent and user models. The
 envelope's `model` comes from `--model`.
 
 | Metric | Unit | Meaning |
@@ -134,6 +134,7 @@ host's, pass `--timestamp` with an explicit UTC time.
   `ValueError`. Upstream labels such runs `ERROR` or `UNSCORED`. The converter does
   not guess a score for them.
 - **Missing pass^k is recorded, not hidden.** Read `errors[]` whenever `num_trials > 1`.
-- **Credentials and endpoints never reach the dataset.** `api_key` and `api_base` are
-  stripped from the `llm_args` tags. Do not put a host name or URL into a tag,
+- **Credentials and endpoints never reach the dataset.** The `llm_args` tags keep only
+  scalar sampling settings (temperature, top_p, top_k, max_tokens, max_completion_tokens,
+  seed, reasoning_effort); every other key is dropped. Do not put a host name or URL into a tag,
   commit message, or doc.
