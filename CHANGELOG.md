@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.67.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.66.0...v0.67.0) (2026-11-11)
+
+
+### Features
+
+* **converters:** add a tau2 converter with runbook and docs ([#510](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/510)) ([9a6eff7](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/9a6eff7469525ad7d4e2e825aba6fe55a5df0c5a))
+
 ## [0.66.0](https://github.com/dryvist/mlx-benchmarks/compare/v0.65.0...v0.66.0) (2026-11-02)
 
 
