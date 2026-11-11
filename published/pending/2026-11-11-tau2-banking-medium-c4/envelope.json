@@ -1,0 +1,114 @@
+{
+  "campaign_dimensions": {
+    "resource": {
+      "energy_j_per_output_token": null,
+      "power_avg_w": null,
+      "power_max_w": null,
+      "tokens_per_second_per_watt": null
+    },
+    "software": {
+      "engine": null,
+      "engine_build": null,
+      "engine_is_latest_stable": null,
+      "engine_latest_stable_at_run": null,
+      "engine_release_date": null,
+      "engine_version": null
+    }
+  },
+  "concurrency": 4,
+  "dimension_null_reasons": {
+    "resource.energy_j_per_output_token": "METRICS_URL_UNSET",
+    "resource.power_avg_w": "METRICS_URL_UNSET",
+    "resource.power_max_w": "METRICS_URL_UNSET",
+    "resource.tokens_per_second_per_watt": "METRICS_URL_UNSET",
+    "software.engine": "not_applicable",
+    "software.engine_build": "not_applicable",
+    "software.engine_is_latest_stable": "not_applicable",
+    "software.engine_latest_stable_at_run": "not_applicable",
+    "software.engine_release_date": "not_applicable",
+    "software.engine_version": "not_applicable"
+  },
+  "env_class": "under-load",
+  "errors": [],
+  "git_sha": "638b3dd",
+  "model": "nvidia/Qwen3.8-27B-NVFP4",
+  "model_revision": "482ca0f3832238542f8f5295dde86b5f22711d80",
+  "results": [
+    {
+      "metric": "pass_1_sim_mean",
+      "name": "tau2_bench",
+      "tags": {
+        "agent_llm": "openai/medium",
+        "agent_llm_args": "{\"temperature\": 0.0}",
+        "n_tasks": "81",
+        "num_trials": "1",
+        "tau2_domain": "banking_knowledge",
+        "tau2_git_commit": "989d3285ae669e49503324bdb9981bf14fccedeb",
+        "user_llm": "openai/medium",
+        "user_llm_args": "{\"temperature\": 0.0}"
+      },
+      "unit": "ratio",
+      "value": 0.48148148148148145
+    },
+    {
+      "metric": "pass_hat_k",
+      "name": "tau2_bench",
+      "tags": {
+        "agent_llm": "openai/medium",
+        "agent_llm_args": "{\"temperature\": 0.0}",
+        "k": "1",
+        "n_tasks": "81",
+        "num_trials": "1",
+        "tau2_domain": "banking_knowledge",
+        "tau2_git_commit": "989d3285ae669e49503324bdb9981bf14fccedeb",
+        "user_llm": "openai/medium",
+        "user_llm_args": "{\"temperature\": 0.0}"
+      },
+      "unit": "ratio",
+      "value": 0.48148148148148145
+    },
+    {
+      "metric": "evaluated_simulations",
+      "name": "tau2_bench",
+      "tags": {
+        "agent_llm": "openai/medium",
+        "agent_llm_args": "{\"temperature\": 0.0}",
+        "n_tasks": "81",
+        "num_trials": "1",
+        "tau2_domain": "banking_knowledge",
+        "tau2_git_commit": "989d3285ae669e49503324bdb9981bf14fccedeb",
+        "user_llm": "openai/medium",
+        "user_llm_args": "{\"temperature\": 0.0}"
+      },
+      "unit": "count",
+      "value": 81.0
+    },
+    {
+      "metric": "infrastructure_errors",
+      "name": "tau2_bench",
+      "tags": {
+        "agent_llm": "openai/medium",
+        "agent_llm_args": "{\"temperature\": 0.0}",
+        "n_tasks": "81",
+        "num_trials": "1",
+        "tau2_domain": "banking_knowledge",
+        "tau2_git_commit": "989d3285ae669e49503324bdb9981bf14fccedeb",
+        "user_llm": "openai/medium",
+        "user_llm_args": "{\"temperature\": 0.0}"
+      },
+      "unit": "count",
+      "value": 16.0
+    }
+  ],
+  "schema_version": "1",
+  "suite": "agentic",
+  "system": {
+    "chip": "Apple M4 Max",
+    "kernel": "27.2.0",
+    "memory_gb": 128,
+    "os": "macOS 27.2.1",
+    "python_version": "3.14.6"
+  },
+  "timestamp": "2026-11-11T03:58:31Z",
+  "trigger": "local"
+}

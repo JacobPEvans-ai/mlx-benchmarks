@@ -1,0 +1,43 @@
+{
+  "concurrency": 4,
+  "config": null,
+  "ctx_per_slot": 98304,
+  "dataset_id": null,
+  "dataset_revision": null,
+  "dataset_task_id": null,
+  "dimension_null_reasons": {
+    "config": "not_applicable",
+    "dataset_id": "not_applicable",
+    "dataset_revision": "not_applicable",
+    "dataset_task_id": "not_applicable",
+    "evaluation_framework": "not_applicable",
+    "prompt_chars": "not_applicable",
+    "prompt_tokens": "not_applicable",
+    "split": "not_applicable",
+    "system_prompt_chars": "not_applicable",
+    "system_prompt_tokens": "not_applicable"
+  },
+  "end_utc": "2026-11-11T07:44:29Z",
+  "engine": "vLLM",
+  "engine_version": "0.32.0",
+  "evaluation_framework": null,
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition"
+  },
+  "harness": "tau2-bench",
+  "kv_cache_dtype": "fp8",
+  "max_tokens": 8192,
+  "power_limit_w": 325.0,
+  "profile": "medium",
+  "prompt_chars": null,
+  "prompt_tokens": null,
+  "router_key_alias": "evals",
+  "run_id": "rtx6000-banking-router-k1",
+  "runner": "tau2-bench v2.0.0 via OpenAI-compatible router",
+  "split": null,
+  "start_utc": "2026-11-11T03:58:31Z",
+  "system_prompt_chars": null,
+  "system_prompt_tokens": null,
+  "temperature": 0.0,
+  "thinking": false
+}
