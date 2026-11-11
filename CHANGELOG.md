@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.69.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.68.0...v0.69.0) (2026-11-11)
+
+
+### Features
+
+* **published:** add tau2 banking_knowledge results for two lanes ([9ba21a8](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/9ba21a826406f7ae1bcf47834d9891cdd638232e))
+* **published:** add tau2 banking_knowledge results for two lanes ([#514](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/514)) ([07914be](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/07914be926cc50933ad38fa603fd67923f82d0d1))
+
 ## [0.68.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.67.0...v0.68.0) (2026-11-11)
 
 
