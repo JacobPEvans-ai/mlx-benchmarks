@@ -80,7 +80,8 @@ repo.
 Everything under `configs/` (a TOML runbook per suite). The run commands are the
 serving stack's `mlx-eval` / `mlx-bench` wrappers (lm-eval / vllm
 `benchmark_serving`), not scripts in this repo. No config-to-arg translation
-layer lives here; the TOML is the runbook.
+layer lives here; the TOML is the runbook. The tau2-bench customer-service suite
+runs upstream `tau2 run` the same way; see [`tau2.md`](tau2.md).
 
 ### Publisher (`src/mlx_benchmarks/`)
 

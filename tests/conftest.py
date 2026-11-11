@@ -54,6 +54,11 @@ def coding_replay_sample() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
+def tau2_results_sample() -> dict[str, Any]:
+    return json.loads((FIXTURES / "tau2_results_sample.json").read_text())
+
+
+@pytest.fixture
 def vllm_bench_serve_nvidia_sample() -> dict[str, Any]:
     return json.loads((FIXTURES / "vllm_bench_serve_nvidia_synthetic.json").read_text())
 

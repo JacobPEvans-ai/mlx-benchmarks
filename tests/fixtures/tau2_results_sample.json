@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-10-20T09:00:00.000000",
+  "info": {
+    "domain_tools_version": null,
+    "language": "en",
+    "communicate_scoring": {"scorer": "substring"},
+    "git_commit": "0123456789abcdef0123456789abcdef01234567",
+    "num_trials": 2,
+    "max_steps": 200,
+    "max_errors": 10,
+    "seed": 300,
+    "user_info": {
+      "implementation": "user_simulator",
+      "llm": "openai/example-user-sim",
+      "llm_args": {
+        "api_base": "https://llm.example.invalid/v1",
+        "api_key": "none",
+        "temperature": 0.0
+      },
+      "global_simulation_guidelines": null,
+      "voice_settings": null
+    },
+    "agent_info": {
+      "implementation": "llm_agent",
+      "llm": "openai/example-served-model",
+      "llm_args": {
+        "api_base": "https://llm.example.invalid/v1",
+        "api_key": "none",
+        "temperature": 0.0
+      },
+      "voice_settings": null
+    },
+    "environment_info": {
+      "domain_name": "airline"
+    }
+  },
+  "tasks": [
+    {"id": "task_a"},
+    {"id": "task_b"}
+  ],
+  "simulations": [
+    {
+      "id": "sim-a-0",
+      "task_id": "task_a",
+      "trial": 0,
+      "seed": 1001,
+      "termination_reason": "user_stop",
+      "duration": 120.5,
+      "agent_cost": null,
+      "user_cost": 0.0,
+      "reward_info": {"reward": 1.0}
+    },
+    {
+      "id": "sim-a-1",
+      "task_id": "task_a",
+      "trial": 1,
+      "seed": 1002,
+      "termination_reason": "agent_stop",
+      "duration": 98.2,
+      "agent_cost": null,
+      "user_cost": 0.0,
+      "reward_info": {"reward": 0.0}
+    },
+    {
+      "id": "sim-b-0",
+      "task_id": "task_b",
+      "trial": 0,
+      "seed": 1003,
+      "termination_reason": "user_stop",
+      "duration": 75.0,
+      "agent_cost": null,
+      "user_cost": 0.0,
+      "reward_info": {"reward": 1.0}
+    },
+    {
+      "id": "sim-b-1",
+      "task_id": "task_b",
+      "trial": 1,
+      "seed": 1004,
+      "termination_reason": "infrastructure_error",
+      "duration": 0.0,
+      "agent_cost": null,
+      "user_cost": null,
+      "reward_info": null
+    }
+  ],
+  "simulation_index": null
+}
