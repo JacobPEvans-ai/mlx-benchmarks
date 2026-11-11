@@ -48,6 +48,8 @@ update PR.
 | `reasoning_effort` | string, free-form | Declared level; see below. |
 | `serving` | object | Server identity. New public rows may include `stack` and `served_model`; the publisher rejects legacy `endpoint_port`. |
 | `model_revision` | string | Model provides HF revision or commit SHA. |
+| `model_kind` | `local \| cloud-endpoint` | Model identity kind; `cloud-endpoint` identifies a model served by an OpenAI-compatible endpoint and skips the Hub model lookup. |
+| `model_provider` | string | Provider serving a `cloud-endpoint` model; only valid with `model_kind: "cloud-endpoint"`, which forbids `model_revision`. |
 | `model_task` | string | Card `pipeline_tag`, else closest official HF task. |
 | `model_task_source` | `model_card \| inferred` | Source for `model_task`. |
 | `quantization` | string | Runtime reports it (e.g. `mlx-4bit`, `mxfp4`). |

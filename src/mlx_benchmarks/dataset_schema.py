@@ -560,6 +560,8 @@ PARQUET_ROW_SCHEMA = pa.schema(
         ("model_task", pa.string()),
         ("model_task_source", pa.string()),
         ("model_revision", pa.string()),
+        ("model_kind", pa.string()),
+        ("model_provider", pa.string()),
         ("quantization", pa.string()),
         ("seed", pa.int64()),
         ("env_class", pa.string()),
