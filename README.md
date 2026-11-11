@@ -117,8 +117,7 @@ Accuracy and throughput suites run on external tools —
 — invoked through thin `uvx` wrappers in the serving stack (nix-ai `mlx-eval` /
 `mlx-bench`), not scripts in this repo. The `tool-calling`, `promptstack`,
 `grounded-summary`, and AA-LCR long-context suites are the exceptions: standalone
-PEP 723 runners under `harness/` (AA-LCR: [`harness/lcr/run.py`](harness/lcr/run.py)),
-documented in [`docs/agentic.md`](docs/agentic.md),
+PEP 723 runners under `harness/`, documented in [`docs/agentic.md`](docs/agentic.md),
 [`docs/promptstack.md`](docs/promptstack.md), and
 [`docs/shootout.md`](docs/shootout.md).
 
