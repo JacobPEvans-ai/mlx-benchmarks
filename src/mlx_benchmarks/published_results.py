@@ -119,6 +119,9 @@ def _cloud_endpoint_fields(envelope: Envelope) -> dict[str, Any]:
         raise ValueError("cloud-endpoint records must not record a Hub model_revision")
     fields: dict[str, Any] = dict.fromkeys(MODEL_FIELDS)
     fields["model_id"] = model_identity(envelope)
+    # The published schema types tags as an array with no null; a cloud record
+    # has no Hub tags to list.
+    fields["tags"] = []
     return fields
 
 

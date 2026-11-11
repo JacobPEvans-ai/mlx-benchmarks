@@ -88,7 +88,8 @@ def test_cloud_endpoint_row_uses_declared_identity_without_hub_lookup(
     assert row["model_id"] == "example-cloud/example-model-7b"
     null_model_fields = {field for field in MODEL_FIELDS if row[field] is None}
     assert null_model_fields
-    assert all(row[field] is None for field in MODEL_FIELDS if field != "model_id")
+    assert all(row[field] is None for field in MODEL_FIELDS if field not in ("model_id", "tags"))
+    assert row["tags"] == []
     reasons = row["dimension_null_reasons"]
     assert all(reasons[field] == "not_applicable" for field in null_model_fields)
     assert reasons["model_revision"] == "not_applicable"
