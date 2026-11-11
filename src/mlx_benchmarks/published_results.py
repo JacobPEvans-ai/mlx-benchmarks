@@ -10,7 +10,7 @@ from typing import Any
 import yaml
 from huggingface_hub import HfApi
 
-from mlx_benchmarks.envelope import Envelope
+from mlx_benchmarks.envelope import CLOUD_ENDPOINT_MODEL_KIND, Envelope, model_identity
 from mlx_benchmarks.privacy import contains_private_identifier_keys
 from mlx_benchmarks.result_contract import (
     MODEL_FIELDS,
@@ -105,6 +105,23 @@ def _model_fields(api: HfApi, model_id: str, revision: str) -> dict[str, Any]:
     }
 
 
+def _cloud_endpoint_fields(envelope: Envelope) -> dict[str, Any]:
+    """Declared model fields for a cloud-endpoint record, with no Hub lookup.
+
+    ``model_id`` is the declared provider-plus-model identity; every
+    Hub-derived field stays null and picks up a ``not_applicable`` reason from
+    the shared null-reason pass in :func:`build_published_results`.
+    """
+    provider = envelope.get("model_provider")
+    if not isinstance(provider, str) or not provider:
+        raise ValueError("cloud-endpoint records must declare model_provider")
+    if envelope.get("model_revision") is not None:
+        raise ValueError("cloud-endpoint records must not record a Hub model_revision")
+    fields: dict[str, Any] = dict.fromkeys(MODEL_FIELDS)
+    fields["model_id"] = model_identity(envelope)
+    return fields
+
+
 def _registered_task(api: HfApi, metadata: dict[str, Any]) -> dict[str, Any]:
     dataset_id = metadata.get("dataset_id")
     dataset_revision = _revision(metadata.get("dataset_revision"), "dataset_revision")
@@ -188,7 +205,10 @@ def build_published_results(
     model_revision = envelope.get("model_revision")
     if not isinstance(model_id, str) or not model_id:
         raise ValueError("model id is required")
-    model = _model_fields(api, model_id, _revision(model_revision, "model_revision"))
+    if envelope.get("model_kind") == CLOUD_ENDPOINT_MODEL_KIND:
+        model = _cloud_endpoint_fields(envelope)
+    else:
+        model = _model_fields(api, model_id, _revision(model_revision, "model_revision"))
     if envelope.get("campaign", {}).get("profile") == "stage0-system-load":
         dimensions = envelope.get("campaign_dimensions") or {}
         model_dimensions = dimensions.get("model") or {}

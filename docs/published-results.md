@@ -22,6 +22,19 @@ copies `model_id`, `pipeline_tag`, `library_name`, `card_data`, `safetensors`,
 type or Hub quantization metadata. The publisher never resolves model metadata
 from a moving branch head.
 
+## Cloud endpoint records
+
+A run may declare `model_kind: "cloud-endpoint"` with `model_provider` and no
+`model_revision`. The publisher skips the Hub model lookup for that kind and
+builds the model fields from the declared identity: `model_id` is
+`<model_provider>/<model>`, and every Hub-derived field is null with a
+`not_applicable` reason in `dimension_null_reasons`. The Parquet shard path
+slugs the provider and model, and rows carry `model_kind` and `model_provider`
+columns, so cloud-endpoint rows stay separable from local model rows and are
+never summed with them. The schema only allows `model_provider` together with
+`model_kind: "cloud-endpoint"`, which forbids `model_revision`. Local models
+keep the strict Hub revision and lookup checks unchanged.
+
 ## Evaluation metadata
 
 An evaluation row records `dataset_id`, `dataset_task_id`,

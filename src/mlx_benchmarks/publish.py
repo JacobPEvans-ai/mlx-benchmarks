@@ -33,7 +33,7 @@ from mlx_benchmarks.dataset_schema import (
     empty_parquet_row,
 )
 from mlx_benchmarks.engine_versions import populate_engine_release_metadata
-from mlx_benchmarks.envelope import Envelope, validate_envelope
+from mlx_benchmarks.envelope import Envelope, model_identity, validate_envelope
 from mlx_benchmarks.power_metrics import PowerMetricsError, enrich_power_metrics
 from mlx_benchmarks.privacy import remove_private_identifiers
 from mlx_benchmarks.published_results import build_published_results, eval_results_path, eval_results_yaml
@@ -128,6 +128,8 @@ def envelope_to_rows(envelope: Envelope) -> list[dict[str, Any]]:
     base["campaign_dimension_null_reasons_json"] = json.dumps(dimension_null_reasons, sort_keys=True)
 
     for key in (
+        "model_kind",
+        "model_provider",
         "model_revision",
         "model_task",
         "model_task_source",
@@ -205,7 +207,9 @@ def target_path(envelope: Envelope, payload: bytes | None = None) -> str:
     """
     timestamp: str = envelope["timestamp"]
     ts_slug = timestamp.replace(":", "-").rstrip("Z")
-    model_slug = slugify(envelope["model"])[:50]
+    # Cloud-endpoint records slug the declared provider plus model identity;
+    # local models slug the Hub model id.
+    model_slug = slugify(model_identity(envelope))[:50]
     prefix = f"data/run-canonical-run-{ts_slug}-{envelope['git_sha']}-{envelope['suite']}-{model_slug}"
     if payload is None:
         return f"{prefix}.parquet"
