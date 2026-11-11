@@ -171,6 +171,7 @@
     {
       "if": {"required": ["model_provider"]},
       "then": {
+        "required": ["model_kind"],
         "properties": {"model_kind": {"const": "cloud-endpoint"}}
       }
     }
