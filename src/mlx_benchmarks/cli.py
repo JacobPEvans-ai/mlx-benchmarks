@@ -75,6 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
             "nvbandwidth",
             "promptfoo",
             "promptstack",
+            "tau2",
             "throughput-probe",
             "vllm",
         ],

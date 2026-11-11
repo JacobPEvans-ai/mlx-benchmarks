@@ -55,6 +55,8 @@ configs/
 │   └── fixtures/             # evidence bundles with known-correct answers
 ├── coding-replay/
 │   └── tasks.json            # in-repo runner: harness/coding-replay/run.py
+├── tau2/
+│   └── tau2.toml             # upstream `tau2 run` (tau2-bench); one run per domain -> --kind tau2
 └── shootout/
     └── candidates.toml       # agent-brain slate: model ids, measured weights,
                               # fit budget, and why each rejection was rejected
@@ -107,8 +109,9 @@ its inventory, endpoint, cache, and power contract is documented in
 
 The repo owns conversion after a supported run: `vllm bench serve` output uses
 the existing `--kind vllm` converter; the OpenAI-compatible
-`harness/throughput/run.py` output uses `--kind throughput-probe`; and lm-eval
-JSON uses `--kind lm-eval`. `llama-bench -o json` and
+`harness/throughput/run.py` output uses `--kind throughput-probe`; lm-eval
+JSON uses `--kind lm-eval`; and the `results.json` from `tau2 run` uses `--kind tau2`
+([tau2 guide](../docs/tau2.md)). `llama-bench -o json` and
 `mlx_lm.benchmark` produce raw stdout diagnostics only; no existing converter
 accepts either format. The campaign recipes do not claim those native outputs
 as envelope data. The llama.cpp native rows use the source procedure's 512 and

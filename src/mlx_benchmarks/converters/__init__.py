@@ -17,6 +17,7 @@ from mlx_benchmarks.converters.nvbandwidth import NvbandwidthConverter
 from mlx_benchmarks.converters.nvidia_offload import KvOffloadConverter, MoeOffloadConverter
 from mlx_benchmarks.converters.promptfoo import PromptfooConverter
 from mlx_benchmarks.converters.promptstack import PromptstackConverter
+from mlx_benchmarks.converters.tau2 import Tau2Converter
 from mlx_benchmarks.converters.throughput_probe import ThroughputProbeConverter
 from mlx_benchmarks.converters.vllm import VllmConverter
 
@@ -40,6 +41,7 @@ __all__ = [
     "NvbandwidthConverter",
     "PromptfooConverter",
     "PromptstackConverter",
+    "Tau2Converter",
     "ThroughputProbeConverter",
     "VllmConverter",
     "get_converter",
@@ -70,6 +72,7 @@ def get_converter(kind: str) -> Converter:
         "nvbandwidth": NvbandwidthConverter,
         "promptstack": PromptstackConverter,
         "promptfoo": PromptfooConverter,
+        "tau2": Tau2Converter,
         "throughput-probe": ThroughputProbeConverter,
         "vllm": VllmConverter,
     }

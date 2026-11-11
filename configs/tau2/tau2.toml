@@ -1,0 +1,64 @@
+# tau2 / tau3 — customer-service tool-use benchmark (sierra-research/tau2-bench, v2.0.0).
+#
+# Upstream `tau2 run` does the evaluation. This repo only converts the results.json
+# it writes (`--kind tau2`). Setup and traps: docs/tau2.md.
+#
+# One run per domain. A text run takes exactly one domain, so each domain writes its
+# own results.json and publishes as its own envelope.
+
+[matrix]
+domains = ["airline", "retail", "telecom", "banking_knowledge"]
+# pass^k is computed only for num_trials > 1. Upstream's default is 1.
+num_trials = 4
+
+[user]
+# The user simulator. Fixed for every arm and every domain: changing it makes arms
+# incomparable. Set the placeholder once to the served id of the one user-simulator
+# model. It is never the model under test.
+llm = "openai/<user-sim-served-id>"
+
+[run]
+# Placeholders, supplied per arm by the consumer:
+#   $DOMAIN     one of [matrix].domains
+#   $MODEL      served model id, as the endpoint advertises it
+#   $BASE_URL   OpenAI-compatible endpoint root, including /v1
+#   $USER_LLM   [user].llm
+#   $NUM_TRIALS [matrix].num_trials
+#   $RUN_NAME   --save-to name; upstream writes data/simulations/$RUN_NAME/results.json
+# The endpoint must serve both $MODEL and the user simulator. A router that loads
+# models on request (llama-swap) does this with one base URL.
+command = """
+tau2 run \
+  --domain $DOMAIN \
+  --agent-llm openai/$MODEL \
+  --agent-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
+  --user-llm $USER_LLM \
+  --user-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
+  --num-trials $NUM_TRIALS \
+  --save-to $RUN_NAME
+"""
+
+[run.smoke]
+# Three tasks, one trial: confirms the endpoint and the user simulator before the full run.
+command = """
+tau2 run \
+  --domain $DOMAIN \
+  --agent-llm openai/$MODEL \
+  --agent-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
+  --user-llm $USER_LLM \
+  --user-llm-args "{\\\"api_base\\\": \\\"$BASE_URL\\\", \\\"api_key\\\": \\\"none\\\", \\\"temperature\\\": 0.0}" \
+  --num-tasks 3 \
+  --num-trials 1 \
+  --save-to $RUN_NAME-smoke
+"""
+
+[publish]
+# $RESULTS_JSON is <tau2-bench checkout>/data/simulations/$RUN_NAME/results.json.
+# Dry-run first: it reads Hub metadata for the model and needs --published-metadata.
+# `agentic` is the suite for tau2 rows; see docs/tau2.md.
+command = """
+mlx-bench-publish $RESULTS_JSON \
+  --kind tau2 --suite agentic \
+  --model $MODEL \
+  --published-metadata $PUBLISHED_METADATA
+"""
