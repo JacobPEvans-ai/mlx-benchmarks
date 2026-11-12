@@ -28,7 +28,9 @@ A run may declare `model_kind: "cloud-endpoint"` with `model_provider` and no
 `model_revision`. The publisher skips the Hub model lookup for that kind and
 builds the model fields from the declared identity: `model_id` is
 `<model_provider>/<model>`, and every Hub-derived field is null with a
-`not_applicable` reason in `dimension_null_reasons`. The Parquet shard path
+`not_applicable` reason in `dimension_null_reasons`; the one exception is
+`tags`, which the published schema types as a non-nullable array, so a cloud
+record lists an empty array rather than a null. The Parquet shard path
 slugs the provider and model, and rows carry `model_kind` and `model_provider`
 columns, so cloud-endpoint rows stay separable from local model rows and are
 never summed with them. The schema only allows `model_provider` together with
