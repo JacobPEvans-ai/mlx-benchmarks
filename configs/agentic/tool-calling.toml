@@ -63,6 +63,23 @@ uv run harness/agentic/run.py \
   --output "run-output/cloud-router/$MODEL/tool-calling/full.json"
 """
 
+# Cloud-router publication profiles. MODEL_PROVIDER is the provider namespace
+# recorded on the cloud-endpoint envelope (Qwen for the current aliases).
+[publish.router_pilot]
+command = """
+mlx-bench-publish "run-output/cloud-router/$MODEL/tool-calling/pilot.json" \
+  --kind agentic --suite tool-calling --model "$MODEL" \
+  --model-kind cloud-endpoint --model-provider "$MODEL_PROVIDER" \
+  --tag stage=pilot
+"""
+
+[publish.router_full]
+command = """
+mlx-bench-publish "run-output/cloud-router/$MODEL/tool-calling/full.json" \
+  --kind agentic --suite tool-calling --model "$MODEL" \
+  --model-kind cloud-endpoint --model-provider "$MODEL_PROVIDER"
+"""
+
 [matrix]
 concurrency = [1, 4]
 thinking = ["on", "off"]
