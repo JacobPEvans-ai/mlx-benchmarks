@@ -236,6 +236,7 @@ Run **both** thinking tracks; judge at the pass gate (concurrency 4, thinking
 ON, large context) — the multi-turn degradation track is where quants fail
 ([trap 5](benchmark-traps.md#trap-5-both-thinking-tracks)). Ship the winning
 track's serving config. Full grid + pass gate: [`agentic.md`](agentic.md).
+For router commands, see [cloud-router runs](cloud-router-runs.md).
 
 ## Step 5 — Publish each shard
 
