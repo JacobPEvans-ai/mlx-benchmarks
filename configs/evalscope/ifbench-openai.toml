@@ -1,5 +1,7 @@
 # IFBench through EvalScope's OpenAI-compatible API adapter.
-# Set ROUTER_BASE_URL and ROUTER_API_KEY in the caller environment. Run the
+# Set MODEL (the alias under test), OUTPUT_PATH (the run's work directory),
+# ROUTER_BASE_URL, ROUTER_API_KEY, and MODEL_PROVIDER (the provider namespace
+# recorded on the cloud-endpoint envelope) in the caller environment. Run the
 # full benchmark dataset; reports are written under reports/$MODEL/ifbench.json.
 
 [run]
@@ -14,5 +16,5 @@ uvx --from evalscope==1.13.0 evalscope eval \\
 command = """
 mlx-bench-publish "$OUTPUT_PATH/reports/$MODEL/ifbench.json" \\
   --kind evalscope --suite framework-eval --model "$MODEL" \\
-  --model-kind cloud-endpoint --model-provider Qwen
+  --model-kind cloud-endpoint --model-provider "$MODEL_PROVIDER"
 """
