@@ -29,9 +29,10 @@ uv run harness/agentic/run.py \
 
 # OpenAI-compatible cloud-router comparison. Set ROUTER_BASE_URL and
 # ROUTER_API_KEY in the caller environment; MODEL is one of the aliases listed
-# in docs/RUNBOOK.md. Pilot covers every thinking/context pair at concurrency 1
-# with streaming, then the full matrix adds concurrency 4, non-streaming, and
-# the 20-round multi-turn track.
+# in docs/cloud-router-runs.md. Pilot covers every thinking/context pair at
+# concurrency 1 with streaming — `--cells conc1_` selects those four grid cells
+# and leaves out the multi-turn track — then the full matrix adds concurrency 4,
+# non-streaming, and the 20-round multi-turn track.
 [run.router_pilot]
 command = """
 uv run harness/agentic/run.py \
@@ -43,6 +44,7 @@ uv run harness/agentic/run.py \
   --thinking on,off \
   --context small,large \
   --stream stream \
+  --cells conc1_ \
   --output "run-output/cloud-router/$MODEL/tool-calling/pilot.json"
 """
 
