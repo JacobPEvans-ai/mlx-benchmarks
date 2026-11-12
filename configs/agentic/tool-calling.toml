@@ -27,6 +27,40 @@ uv run harness/agentic/run.py \
   --repeats 3
 """
 
+# OpenAI-compatible cloud-router comparison. Set ROUTER_BASE_URL and
+# ROUTER_API_KEY in the caller environment; MODEL is one of the aliases listed
+# in docs/RUNBOOK.md. Pilot covers every thinking/context pair at concurrency 1
+# with streaming, then the full matrix adds concurrency 4, non-streaming, and
+# the 20-round multi-turn track.
+[run.router_pilot]
+command = """
+uv run harness/agentic/run.py \
+  --base-url "$ROUTER_BASE_URL" \
+  --api-key-env ROUTER_API_KEY \
+  --model "$MODEL" \
+  --repeats 3 \
+  --concurrency 1 \
+  --thinking on,off \
+  --context small,large \
+  --stream stream \
+  --output "run-output/cloud-router/$MODEL/tool-calling/pilot.json"
+"""
+
+[run.router_full]
+command = """
+uv run harness/agentic/run.py \
+  --base-url "$ROUTER_BASE_URL" \
+  --api-key-env ROUTER_API_KEY \
+  --model "$MODEL" \
+  --repeats 10 \
+  --concurrency 1,4 \
+  --thinking on,off \
+  --context small,large \
+  --stream stream,nostream \
+  --multiturn-rounds 20 \
+  --output "run-output/cloud-router/$MODEL/tool-calling/full.json"
+"""
+
 [matrix]
 concurrency = [1, 4]
 thinking = ["on", "off"]
