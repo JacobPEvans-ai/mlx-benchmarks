@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.71.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.70.1...v0.71.0) (2026-11-12)
+
+
+### Features
+
+* add cloud router benchmark configurations ([#521](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/521)) ([d2f47c6](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/d2f47c65937bedad5c881b4aa25c16218a93dcb0))
+
 ## [0.70.1](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.70.0...v0.70.1) (2026-11-12)
 
 
