@@ -27,6 +27,59 @@ uv run harness/agentic/run.py \
   --repeats 3
 """
 
+# OpenAI-compatible cloud-router comparison. Set ROUTER_BASE_URL and
+# ROUTER_API_KEY in the caller environment; MODEL is one of the aliases listed
+# in docs/cloud-router-runs.md. Pilot covers every thinking/context pair at
+# concurrency 1 with streaming — `--cells conc1_` selects those four grid cells
+# and leaves out the multi-turn track — then the full matrix adds concurrency 4,
+# non-streaming, and the 20-round multi-turn track.
+[run.router_pilot]
+command = """
+uv run harness/agentic/run.py \
+  --base-url "$ROUTER_BASE_URL" \
+  --api-key-env ROUTER_API_KEY \
+  --model "$MODEL" \
+  --repeats 3 \
+  --concurrency 1 \
+  --thinking on,off \
+  --context small,large \
+  --stream stream \
+  --cells conc1_ \
+  --output "run-output/cloud-router/$MODEL/tool-calling/pilot.json"
+"""
+
+[run.router_full]
+command = """
+uv run harness/agentic/run.py \
+  --base-url "$ROUTER_BASE_URL" \
+  --api-key-env ROUTER_API_KEY \
+  --model "$MODEL" \
+  --repeats 10 \
+  --concurrency 1,4 \
+  --thinking on,off \
+  --context small,large \
+  --stream stream,nostream \
+  --multiturn-rounds 20 \
+  --output "run-output/cloud-router/$MODEL/tool-calling/full.json"
+"""
+
+# Cloud-router publication profiles. MODEL_PROVIDER is the provider namespace
+# recorded on the cloud-endpoint envelope (Qwen for the current aliases).
+[publish.router_pilot]
+command = """
+mlx-bench-publish "run-output/cloud-router/$MODEL/tool-calling/pilot.json" \
+  --kind agentic --suite tool-calling --model "$MODEL" \
+  --model-kind cloud-endpoint --model-provider "$MODEL_PROVIDER" \
+  --tag stage=pilot
+"""
+
+[publish.router_full]
+command = """
+mlx-bench-publish "run-output/cloud-router/$MODEL/tool-calling/full.json" \
+  --kind agentic --suite tool-calling --model "$MODEL" \
+  --model-kind cloud-endpoint --model-provider "$MODEL_PROVIDER"
+"""
+
 [matrix]
 concurrency = [1, 4]
 thinking = ["on", "off"]

@@ -1,12 +1,5 @@
 # Changelog
 
-## [0.70.1](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.70.0...v0.70.1) (2026-11-12)
-
-
-### Bug Fixes
-
-* **space:** keep legacy series keys unchanged for local records ([#520](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/520)) ([678938b](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/678938b18c611b77b698ba4d20abd93fbc4f045b))
-
 ## [0.70.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.69.1...v0.70.0) (2026-11-12)
 
 

@@ -83,6 +83,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--suite", required=True, help="Envelope suite (must be in schema enum)")
     parser.add_argument("--model", help="Override model ID (default: extract from results_json)")
+    parser.add_argument(
+        "--model-kind",
+        choices=["local", "cloud-endpoint"],
+        help="Declare a cloud endpoint so publication skips the Hub model lookup",
+    )
+    parser.add_argument(
+        "--model-provider",
+        help="Provider namespace for --model-kind cloud-endpoint (for example, Qwen)",
+    )
     parser.add_argument("--model-revision", help="Recorded 40-character Hugging Face model commit")
     parser.add_argument("--git-sha", help="Override git SHA recorded in envelope (default: git rev-parse)")
     parser.add_argument(
@@ -171,7 +180,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.model_kind == "cloud-endpoint" and not args.model_provider:
+        parser.error("--model-provider is required with --model-kind cloud-endpoint")
+    if args.model_provider and args.model_kind != "cloud-endpoint":
+        parser.error("--model-provider requires --model-kind cloud-endpoint")
+    if args.model_kind == "cloud-endpoint" and args.model_revision:
+        parser.error("--model-revision cannot be used with --model-kind cloud-endpoint")
     # Every log line starts with an ISO-8601 UTC timestamp ending in 'Z'.
     # gmtime makes asctime UTC; the literal Z in datefmt marks the zone. force=True
     # re-attaches a stderr handler instead of no-opping when root already has one.
@@ -332,7 +348,16 @@ def main(argv: list[str] | None = None) -> int:
             ):
                 raise ValueError(f"KVO_RESULT suite {cell['suite']!r} does not match --suite {args.suite!r}")
             envelope = converter.build_envelope(cell, ctx)
-            model_revision = _extract_model_revision(cell) or args.model_revision
+            if args.model_kind is not None:
+                envelope["model_kind"] = args.model_kind
+            if args.model_provider is not None:
+                envelope["model_provider"] = args.model_provider
+            input_revision = _extract_model_revision(cell)
+            if args.model_kind == "cloud-endpoint" and input_revision is not None:
+                raise ValueError("cloud-endpoint results must not contain a Hub model revision")
+            model_revision = (
+                None if args.model_kind == "cloud-endpoint" else (input_revision or args.model_revision)
+            )
             if batch and not model_revision:
                 raise ValueError("offload publication needs the model's recorded --model-revision")
             if model_revision is not None:

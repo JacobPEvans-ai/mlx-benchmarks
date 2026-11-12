@@ -318,6 +318,44 @@ def test_cli_omits_reasoning_effort_when_not_declared(
     assert "reasoning_effort" not in envelope
 
 
+def test_cli_cloud_endpoint_identity_reaches_publisher(
+    tmp_path: Path, lm_eval_sample: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    envelope = _publish_via_cli(
+        tmp_path,
+        lm_eval_sample,
+        monkeypatch,
+        "--model",
+        "qwen4-max-preview",
+        "--model-kind",
+        "cloud-endpoint",
+        "--model-provider",
+        "Qwen",
+    )
+
+    assert envelope["model"] == "qwen4-max-preview"
+    assert envelope["model_kind"] == "cloud-endpoint"
+    assert envelope["model_provider"] == "Qwen"
+    assert "model_revision" not in envelope
+    validate_envelope(envelope)
+
+
+def test_cli_cloud_endpoint_requires_provider(capsys: pytest.CaptureFixture) -> None:
+    with pytest.raises(SystemExit):
+        main(
+            [
+                "results.json",
+                "--kind",
+                "lm-eval",
+                "--suite",
+                "reasoning",
+                "--model-kind",
+                "cloud-endpoint",
+            ]
+        )
+    assert "--model-provider is required" in capsys.readouterr().err
+
+
 def test_cli_rejects_invalid_tag(tmp_path: Path, lm_eval_sample: dict) -> None:
     results_path = _write_sample(tmp_path, lm_eval_sample)
     with pytest.raises(SystemExit, match="invalid --tag"):
