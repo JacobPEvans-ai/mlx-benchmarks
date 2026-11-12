@@ -18,6 +18,24 @@ from typing import Any, Literal, Required, TypedDict, cast
 import jsonschema
 from jsonschema import Draft7Validator
 
+# model_kind value for a run served by an OpenAI-compatible cloud endpoint.
+# Only this kind skips the Hub model lookup; local models keep it.
+CLOUD_ENDPOINT_MODEL_KIND = "cloud-endpoint"
+
+
+def model_identity(envelope: Envelope | dict[str, Any]) -> str:
+    """Published identity of the run's model.
+
+    Cloud-endpoint records use the declared ``model_provider`` plus ``model``
+    (``provider/model``); local models use the Hub model id verbatim.
+    """
+    model = envelope["model"]
+    if envelope.get("model_kind") == CLOUD_ENDPOINT_MODEL_KIND:
+        provider = envelope.get("model_provider")
+        if provider:
+            return f"{provider}/{model}"
+    return model
+
 
 class TopologyNode(TypedDict, total=False):
     hostname: str
@@ -154,6 +172,8 @@ class Envelope(TypedDict, total=False):
     model_task: str
     model_task_source: Literal["model_card", "inferred"]
     model_revision: str
+    model_kind: Literal["local", "cloud-endpoint"]
+    model_provider: str
     quantization: str
     campaign: Campaign
     campaign_dimensions: CampaignDimensions

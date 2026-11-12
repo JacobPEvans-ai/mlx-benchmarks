@@ -338,6 +338,39 @@ def test_serving_rejects_unknown_key(valid_envelope: dict) -> None:
         validate_envelope({**valid_envelope, "serving": {"stack": "x", "bogus": 1}})
 
 
+def test_cloud_endpoint_envelope_validates(cloud_endpoint_envelope: dict) -> None:
+    validate_envelope(cloud_endpoint_envelope)
+
+
+def test_cloud_endpoint_envelope_requires_provider(valid_envelope: dict) -> None:
+    envelope = {**valid_envelope, "model_kind": "cloud-endpoint"}
+    envelope.pop("model_revision")
+    with pytest.raises(EnvelopeValidationError):
+        validate_envelope(envelope)
+
+
+def test_cloud_endpoint_envelope_rejects_hub_revision(valid_envelope: dict) -> None:
+    envelope = {
+        **valid_envelope,
+        "model_kind": "cloud-endpoint",
+        "model_provider": "example-cloud",
+    }
+    with pytest.raises(EnvelopeValidationError):
+        validate_envelope(envelope)
+
+
+def test_model_provider_requires_cloud_endpoint_kind(valid_envelope: dict) -> None:
+    with pytest.raises(EnvelopeValidationError):
+        validate_envelope({**valid_envelope, "model_provider": "example-cloud"})
+    with pytest.raises(EnvelopeValidationError):
+        validate_envelope({**valid_envelope, "model_kind": "local", "model_provider": "example-cloud"})
+
+
+def test_model_kind_rejects_unknown_value(valid_envelope: dict) -> None:
+    with pytest.raises(EnvelopeValidationError):
+        validate_envelope({**valid_envelope, "model_kind": "hosted"})
+
+
 def test_topology_parallelism_enum_is_enforced(valid_envelope: dict) -> None:
     env = {
         **valid_envelope,

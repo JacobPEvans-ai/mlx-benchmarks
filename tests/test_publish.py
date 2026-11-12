@@ -42,6 +42,16 @@ def test_target_path_format(valid_envelope: dict) -> None:
     assert valid_envelope["suite"] in path
 
 
+def test_target_path_slugs_cloud_provider_and_model(
+    cloud_endpoint_envelope: dict, valid_envelope: dict
+) -> None:
+    cloud_path = target_path(cloud_endpoint_envelope, payload=b"payload")
+    assert slugify(cloud_endpoint_envelope["model_provider"]) in cloud_path
+    assert slugify(cloud_endpoint_envelope["model"]) in cloud_path
+    # Local models keep slugging the Hub model id alone.
+    assert slugify(valid_envelope["model"]) in target_path(valid_envelope)
+
+
 def test_canonical_shard_path_covers_run_and_aggregate_files() -> None:
     assert canonical_shard_path("data/run-2026-07-01.parquet") == (
         "data/run-canonical-run-2026-07-01.parquet"
@@ -352,6 +362,82 @@ def test_publish_writes_hub_fields_as_named_parquet_columns(
     assert row["dataset_id"] == published_metadata["dataset_id"]
     assert row["engine"] == published_metadata["engine"]
     assert "published_result_json" not in row
+
+
+def test_cloud_endpoint_publishes_declared_identity(
+    cloud_endpoint_envelope: dict,
+    valid_envelope: dict,
+    published_metadata: dict,
+    mock_hf_registry: None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    written_rows: list[dict] = []
+    original = publish_module.rows_to_parquet
+
+    def capture(rows: list[dict]) -> bytes:
+        written_rows.extend(rows)
+        return original(rows)
+
+    monkeypatch.setattr(publish_module, "rows_to_parquet", capture)
+    path = publish(cloud_endpoint_envelope, published_metadata=published_metadata, dry_run=True)
+
+    assert path.startswith(target_path(cloud_endpoint_envelope).removesuffix(".parquet"))
+    # The declared provider and model slug into the shard path.
+    assert cloud_endpoint_envelope["model_provider"] in path
+    assert cloud_endpoint_envelope["model"] in path
+
+    [row] = written_rows
+    assert row["model"] == cloud_endpoint_envelope["model"]
+    assert row["model_kind"] == "cloud-endpoint"
+    assert row["model_provider"] == cloud_endpoint_envelope["model_provider"]
+    assert row["model_id"] == "example-cloud/example-model-7b"
+    assert row["model_revision"] is None
+    reasons = json.loads(row["dimension_null_reasons"])
+    assert reasons["model_revision"] == "not_applicable"
+    assert row["pipeline_tag"] is None
+
+    # Local rows keep the kind columns null so cloud and local rows stay separable.
+    [local_row] = envelope_to_rows(valid_envelope)
+    assert local_row["model_kind"] is None
+    assert local_row["model_provider"] is None
+
+
+def test_hub_model_lookup_runs_only_for_local_models(
+    valid_envelope: dict,
+    cloud_endpoint_envelope: dict,
+    published_metadata: dict,
+    mock_hf_registry: None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from huggingface_hub import HfApi
+
+    looked_up: list[str] = []
+    original = HfApi.model_info
+
+    def counting_model_info(
+        self: HfApi, repo_id: str, revision: str | None = None, **kwargs: object
+    ) -> object:
+        looked_up.append(repo_id)
+        return original(self, repo_id=repo_id, revision=revision, **kwargs)
+
+    monkeypatch.setattr(HfApi, "model_info", counting_model_info)
+
+    publish(cloud_endpoint_envelope, published_metadata=published_metadata, dry_run=True)
+    assert looked_up == []
+
+    publish(valid_envelope, published_metadata=published_metadata, dry_run=True)
+    assert looked_up == [valid_envelope["model"]]
+
+
+def test_local_model_without_revision_is_still_rejected(
+    valid_envelope: dict,
+    published_metadata: dict,
+    mock_hf_registry: None,
+) -> None:
+    envelope = {**valid_envelope}
+    envelope.pop("model_revision")
+    with pytest.raises(PublishError, match="40-character Hub commit SHA"):
+        publish(envelope, published_metadata=published_metadata, dry_run=True)
 
 
 def test_publish_performance_only_rows_do_not_claim_an_eval_result(

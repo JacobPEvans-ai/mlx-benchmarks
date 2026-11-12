@@ -29,14 +29,13 @@ Closed suite set: `throughput`, `throughput-serving`, `ttft`, `mixed-context`,
 `elastic`, `max-context`, `tool-calling`, `code-accuracy`,
 `framework-eval`, `capability-comparison`, `coding`, `reasoning`,
 `knowledge`, `evalplus`, `math-hard`, `promptstack`, `grounded-summary`, plus the
-four hardware baselines `gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under
+hardware baselines `gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under
 test: publish them with `--model hardware-baseline`). Framework evaluations can
 carry `results[].tags.domain` values `spl`, `tool-queries`, `agentic`, `triage`,
 or `homelab-access`. The `repo-qa` suite records deterministic answers to
-repository questions over packed context. Related runs should keep using an
-existing suite such as `tool-calling` when that suite already describes the
-measurement. Adding a suite means editing `schema.json` and filing a schema
-update PR.
+repository questions over packed context. Related runs reuse an existing
+suite that already describes the measurement; adding a suite means editing
+`schema.json` and filing a schema update PR.
 
 ## Optional top-level fields
 
@@ -46,8 +45,9 @@ update PR.
 | `env_class` | `isolated \| under-load` | Load class (policy gate 3). |
 | `concurrency` | integer (≥1) | In-flight request count. |
 | `reasoning_effort` | string, free-form | Declared level; see below. |
-| `serving` | object | Server identity. New public rows may include `stack` and `served_model`; the publisher rejects legacy `endpoint_port`. |
+| `serving` | object | Server identity; `stack` and `served_model` allowed, legacy `endpoint_port` rejected. |
 | `model_revision` | string | Model provides HF revision or commit SHA. |
+| `model_kind`, `model_provider` | strings | Cloud-endpoint identity; `cloud-endpoint` skips the Hub lookup. |
 | `model_task` | string | Card `pipeline_tag`, else closest official HF task. |
 | `model_task_source` | `model_card \| inferred` | Source for `model_task`. |
 | `quantization` | string | Runtime reports it (e.g. `mlx-4bit`, `mxfp4`). |

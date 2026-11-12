@@ -822,8 +822,14 @@ def add_evidence_metadata(
     df["workload_complete"] = df.loc[:, list(WORKLOAD_FIELDS)].notna().all(axis="columns")
     efforts = df.get("reasoning_effort", pd.Series(None, index=df.index)).map(_clean_value).fillna("unstated")
     variants = df["variant"].map(_clean_value)
+    # Cloud and local records may share a model name; the declared kind,
+    # provider, and provider-qualified id keep their series apart. Shards
+    # published before the columns existed read them as null and keep keys.
     identity_fields = (
         "model",
+        "model_kind",
+        "model_provider",
+        "model_id",
         "machine",
         "host",
         "accelerator",

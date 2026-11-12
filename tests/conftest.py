@@ -111,6 +111,18 @@ def invalid_envelope() -> dict[str, Any]:
 
 
 @pytest.fixture
+def cloud_endpoint_envelope(valid_envelope: dict[str, Any]) -> dict[str, Any]:
+    envelope = {
+        **valid_envelope,
+        "model": "example-model-7b",
+        "model_kind": "cloud-endpoint",
+        "model_provider": "example-cloud",
+    }
+    envelope.pop("model_revision")
+    return envelope
+
+
+@pytest.fixture
 def published_metadata() -> dict[str, Any]:
     return {
         "dataset_id": "owner/benchmark",
