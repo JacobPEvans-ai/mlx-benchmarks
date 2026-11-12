@@ -297,6 +297,43 @@ def test_rows_without_the_column_still_get_a_series_key() -> None:
     assert all(key.endswith("unstated") for key in out["series_key"])
 
 
+def test_cloud_and_local_rows_with_the_same_model_name_stay_two_series() -> None:
+    """A cloud endpoint and a local build can serve the same model name; the
+    declared kind, provider, and provider-qualified model id must keep them as
+    two series, so the summary's latest-row-per-key keeps both rows."""
+    rows = pd.DataFrame([SAMPLE_ROWS[0], SAMPLE_ROWS[0]])
+    rows["timestamp"] = pd.to_datetime(rows["timestamp"], utc=True)
+    rows["source_path"] = ["data/cloud.parquet", "data/local.parquet"]
+    rows["model_kind"] = ["cloud-endpoint", None]
+    rows["model_provider"] = ["together", None]
+    rows["model_id"] = ["together/Qwen3.5-9B-MLX-4bit", "mlx-community/Qwen3.5-9B-MLX-4bit"]
+
+    out = app.add_evidence_metadata(rows, {}, pd.Timestamp("2026-08-25T00:00:00Z"))
+    assert out["series_key"].nunique() == 2
+
+    pivot = app.summary_table(out, "reasoning", SAMPLE_ROWS[0]["name"], SAMPLE_ROWS[0]["metric"])
+    assert len(pivot) == 2
+
+
+def test_old_shard_rows_without_cloud_columns_keep_their_series_key() -> None:
+    """Shards published before cloud identity existed lack the columns entirely;
+    missing must read as null — the same key an explicit-null row gets — so
+    every pre-cloud series keeps its previous composition."""
+    rows = pd.DataFrame([SAMPLE_ROWS[0], SAMPLE_ROWS[0]])
+    rows["timestamp"] = pd.to_datetime(rows["timestamp"], utc=True)
+    rows["source_path"] = ["data/a.parquet", "data/b.parquet"]
+    rows["model_kind"] = None
+    rows["model_provider"] = None
+    rows["model_id"] = None
+    with_nulls = app.add_evidence_metadata(rows, {}, pd.Timestamp("2026-08-25T00:00:00Z"))
+
+    without = rows.drop(columns=["model_kind", "model_provider", "model_id"])
+    without_columns = app.add_evidence_metadata(without, {}, pd.Timestamp("2026-08-25T00:00:00Z"))
+
+    assert without_columns["series_key"].tolist() == with_nulls["series_key"].tolist()
+    assert with_nulls["series_key"].nunique() == 1
+
+
 def _workload_rows() -> pd.DataFrame:
     rows = pd.DataFrame(
         [
