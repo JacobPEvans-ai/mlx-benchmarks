@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.70.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.69.1...v0.70.0) (2026-11-12)
+
+
+### Features
+
+* **publish:** publish cloud-endpoint records without a Hub revision ([#516](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/516)) ([d3ca6a5](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/d3ca6a5bd6188dd7e7464250e165162e2e49c482))
+
 ## [0.69.1](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.69.0...v0.69.1) (2026-11-12)
 
 
