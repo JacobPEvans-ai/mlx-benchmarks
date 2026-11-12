@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.69.1](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.69.0...v0.69.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **ci:** add missing job timeouts and PR-scoped cancellation to ci-gate ([#517](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/517)) ([fc45ba5](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/fc45ba511989e83fec55aac201fe81c27446b380))
+
 ## [0.69.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.68.0...v0.69.0) (2026-11-11)
 
 
