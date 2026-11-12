@@ -822,14 +822,10 @@ def add_evidence_metadata(
     df["workload_complete"] = df.loc[:, list(WORKLOAD_FIELDS)].notna().all(axis="columns")
     efforts = df.get("reasoning_effort", pd.Series(None, index=df.index)).map(_clean_value).fillna("unstated")
     variants = df["variant"].map(_clean_value)
-    # Cloud and local records may share a model name; the declared kind,
-    # provider, and provider-qualified id keep their series apart. Shards
-    # published before the columns existed read them as null and keep keys.
+    # Only cloud endpoints include their declared identity; local and legacy
+    # records keep the pre-cloud series-key composition.
     identity_fields = (
         "model",
-        "model_kind",
-        "model_provider",
-        "model_id",
         "machine",
         "host",
         "accelerator",
@@ -860,7 +856,15 @@ def add_evidence_metadata(
         values = [row.get(field) for field in identity_fields]
         values.append(variants.loc[row.name])
         joined = "|".join("" if _clean_value(value) is None else str(value) for value in values)
-        return f"{joined}|{efforts.loc[row.name] or 'unstated'}"
+        key = f"{joined}|{efforts.loc[row.name] or 'unstated'}"
+        if _clean_value(row.get("model_kind")) == "cloud-endpoint":
+            cloud_values = []
+            for field in ("model_kind", "model_provider", "model_id"):
+                value = _clean_value(row.get(field))
+                cloud_values.append("" if value is None else str(value))
+            cloud_identity = "|".join(cloud_values)
+            return f"{key}|{cloud_identity}"
+        return key
 
     df["series_key"] = df.apply(comparison_key, axis="columns")
 
