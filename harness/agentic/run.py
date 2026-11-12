@@ -877,7 +877,7 @@ async def _run(args: argparse.Namespace, timestamp: str, partial_path: Path) -> 
     cells: list[dict[str, Any]] = []
     multiturn: list[dict[str, Any]] = []
     async with httpx.AsyncClient(
-        base_url=args.base_url.rstrip("/"), headers=headers, timeout=args.timeout, trust_env=False
+        base_url=args.base_url.rstrip("/"), headers=headers, timeout=args.timeout
     ) as client:
         for concurrency in concurrencies:
             for thinking in thinking_modes:
