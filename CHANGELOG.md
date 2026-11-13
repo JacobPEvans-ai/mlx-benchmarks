@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.72.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.71.0...v0.72.0) (2026-11-13)
+
+
+### Features
+
+* add dense-layout-image-text extraction accuracy suite ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* add dense-layout-image-text extraction accuracy suite ([#525](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/525)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **publish:** convert NVIDIA offload benchmark cells ([#476](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/476)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **published:** add tau2 banking_knowledge results for two lanes ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **published:** add tau2 banking_knowledge results for two lanes ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **run-index:** add 21 benchmark result entries ([#483](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/483)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **run-index:** index the 2026-10-19 Mac cluster shards ([#479](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/479)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+* **run-index:** index the MiniMax-M2.7-3bit Mac cluster shards ([#481](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/481)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+
+
+### Bug Fixes
+
+* **viewer:** label same-knob bars by their variant difference ([#473](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/473)) ([c6e17e9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/c6e17e9fd2d4bf43cfb608799bd86f57e35b3a6b))
+
 ## [0.71.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.70.1...v0.71.0) (2026-11-12)
 
 
