@@ -10,7 +10,7 @@ under the ``all`` label.
 CER and WER are lower-is-better and deliberately **not** ``ratio``-unit rows:
 they are unbounded above (a response longer than its reference scores > 1),
 so each row states its unit and its ``direction`` tag explicitly. ``thinking``
-is always ``n/a`` — image-to-text transcription models have no thinking arm.
+is always ``n/a`` — image-to-text extraction models have no thinking arm.
 The overall block carries ``duration_seconds``; label blocks share the same
 run window, so repeating it per label would overstate their individual cost.
 """

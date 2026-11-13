@@ -3,11 +3,11 @@
 # requires-python = ">=3.13"
 # dependencies = ["httpx>=0.28.1", "jiwer>=3.0"]
 # ///
-"""dense-layout — image-to-text transcription accuracy benchmark.
+"""dense-layout — image-to-text extraction accuracy benchmark.
 
 Sends each dense-layout image to an OpenAI-compatible ``/v1/chat/completions``
-endpoint as a base64 ``image_url`` content part with a fixed transcription
-prompt, and scores the returned transcription against the dataset's reference
+endpoint as a base64 ``image_url`` content part with a fixed extraction
+prompt, and scores the extracted text against the dataset's reference
 answer. Dense layouts — many panes, tables, tab strips, form fields — are where
 small image-to-text models degrade first, so every score is deterministic and
 none is model-graded:
@@ -22,8 +22,13 @@ none is model-graded:
 ``seconds_per_image`` / ``error_rate``
     Mean successful-request latency and the share of requests that errored.
 
+An answer file may set ``"text_complete": false`` when the reference text is
+not the model's job to reproduce in full: that image then drops out of the
+CER/WER means (a missing key means the extracted text is complete) and only
+``field_recall``, latency, and ``error_rate`` score it.
+
 An empty completion or ``finish_reason == "length"`` is a counted error and a
-non-zero exit — a truncated or absent transcription must never score as a
+non-zero exit — a truncated or absent extraction must never score as a
 (possibly perfect) empty answer.
 
 Dataset layout (directory named by ``DENSE_LAYOUT_DATASET_DIR``; the dataset
@@ -31,7 +36,8 @@ never lives inside the repo)::
 
     manifest.json          # list of {"file": ..., "label": ...}
     images/<file>.jpg      # the dense-layout images
-    answers/<file>.json    # {"text": full reference transcription,
+    answers/<file>.json    # {"text": full reference answer,
+                           #  "text_complete": false,  (optional; see above)
                            #  "fields": {"key": "value", ...}}  (fields optional)
 
 Run::
@@ -65,10 +71,9 @@ from typing import Any
 
 DATASET_DIR_ENV = "DENSE_LAYOUT_DATASET_DIR"
 
-TRANSCRIPTION_PROMPT = (
-    "Transcribe all text visible in this image exactly as it appears, "
-    "preserving the reading order and the layout of the text regions. "
-    "Output only the transcription, with no commentary."
+EXTRACTION_PROMPT = (
+    "Extract all text visible in this image exactly as it appears, in natural "
+    "reading order. Output only the extracted text, with no commentary."
 )
 
 
@@ -103,7 +108,7 @@ def field_matches(output_text: str, field_value: str) -> bool:
     """True when the reference field value appears verbatim in the output.
 
     Case-insensitive and whitespace-normalised on both sides, so a value
-    wrapped across a line break in the transcription still matches.
+    wrapped across a line break in the extracted text still matches.
     """
     return normalize_whitespace(field_value).casefold() in normalize_whitespace(output_text).casefold()
 
@@ -122,7 +127,7 @@ def field_recall(output_text: str, fields: Mapping[str, str]) -> tuple[float, in
 
 
 def score_image(reference_text: str, fields: Mapping[str, str], response_text: str) -> dict[str, Any]:
-    """Score one transcription against one answer. Every check is deterministic."""
+    """Score one response against one answer. Every check is deterministic."""
     recall, n_found, n_fields = field_recall(response_text, fields)
     return {
         "cer": cer(reference_text, response_text),
@@ -142,8 +147,11 @@ def mean(values: Sequence[float]) -> float | None:
 def aggregate_records(records: Sequence[Mapping[str, Any]], wall_seconds: float) -> dict[str, Any]:
     """Aggregate per-request records into one metric block.
 
-    Error records are excluded from the accuracy and latency means (they carry
-    no transcription to score) and counted in ``error_rate``. ``field_recall``
+    Error records are excluded from every mean (they carry no response to
+    score) and counted in ``error_rate``. Records whose answer set
+    ``text_complete: false`` carry ``cer``/``wer`` of ``None``: they drop out
+    of those means without scoring as 0, while still counting toward
+    ``field_recall``, latency, and ``error_rate``. ``field_recall``
     is weighted by field count so an image with many fields moves the number
     more than one with a single field.
     """
@@ -224,12 +232,16 @@ def load_dataset(dataset_dir: Path) -> list[dict[str, Any]]:
             isinstance(k, str) and isinstance(v, str) for k, v in fields.items()
         ):
             raise ValueError(f"manifest entry {file!r}: 'fields' must be an object of string to string")
+        text_complete = answer.get("text_complete", True)
+        if not isinstance(text_complete, bool):
+            raise ValueError(f"manifest entry {file!r}: 'text_complete' must be a boolean")
         entries.append(
             {
                 "file": file,
                 "label": str(item.get("label", "unlabeled")),
                 "image_bytes": image_bytes,
                 "reference_text": answer["text"],
+                "text_complete": text_complete,
                 "fields": fields,
             }
         )
@@ -242,8 +254,8 @@ def load_dataset(dataset_dir: Path) -> list[dict[str, Any]]:
 # ---------------------------------------------------------------------------
 
 
-def transcription_body(args: argparse.Namespace, image_bytes: bytes) -> dict[str, Any]:
-    """One chat completion: fixed transcription prompt + base64 ``image_url``."""
+def extraction_body(args: argparse.Namespace, image_bytes: bytes) -> dict[str, Any]:
+    """One chat completion: fixed extraction prompt + base64 ``image_url``."""
     data_url = f"data:image/jpeg;base64,{base64.b64encode(image_bytes).decode('ascii')}"
     return {
         "model": args.model,
@@ -251,7 +263,7 @@ def transcription_body(args: argparse.Namespace, image_bytes: bytes) -> dict[str
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": TRANSCRIPTION_PROMPT},
+                    {"type": "text", "text": EXTRACTION_PROMPT},
                     {"type": "image_url", "image_url": {"url": data_url}},
                 ],
             }
@@ -296,13 +308,16 @@ def score_request(
     """Turn one raw response into one scored record, or one counted error.
 
     An empty completion and ``finish_reason == "length"`` are errors — never a
-    valid (and deceptively cheap) empty transcription.
+    valid (and deceptively cheap) empty extraction. When the answer sets
+    ``text_complete: false`` the record skips CER/WER (they stay ``None`` so
+    the aggregator cannot average them) and keeps ``field_recall``.
     """
     record: dict[str, Any] = {
         "file": entry["file"],
         "label": entry["label"],
         "repeat": repeat,
-        "transcription": None,
+        "extracted_text": None,
+        "text_complete": bool(entry.get("text_complete", True)),
         "cer": None,
         "wer": None,
         "field_recall": None,
@@ -323,10 +338,16 @@ def score_request(
         return record
     if record["finish_reason"] == "length":
         record["error"] = "finish_reason=length"
-        record["transcription"] = text
+        record["extracted_text"] = text
         return record
-    record["transcription"] = text
-    record.update(score_image(entry["reference_text"], entry.get("fields") or {}, text))
+    record["extracted_text"] = text
+    if record["text_complete"]:
+        record.update(score_image(entry["reference_text"], entry.get("fields") or {}, text))
+    else:
+        recall, n_found, n_fields = field_recall(text, entry.get("fields") or {})
+        record["field_recall"] = recall if n_fields else None
+        record["n_fields"] = n_fields
+        record["n_fields_found"] = n_found
     return record
 
 
@@ -337,7 +358,7 @@ async def run_entry(
     semaphore: asyncio.Semaphore,
 ) -> list[dict[str, Any]]:
     """Score one manifest entry ``--repeats`` times."""
-    body = transcription_body(args, entry["image_bytes"])
+    body = extraction_body(args, entry["image_bytes"])
     records: list[dict[str, Any]] = []
 
     async def once(repeat: int) -> None:
@@ -356,7 +377,7 @@ async def run_entry(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Dense-layout image-to-text transcription accuracy benchmark"
+        description="Dense-layout image-to-text extraction accuracy benchmark"
     )
     parser.add_argument("--base-url", required=True, help="OpenAI-compatible /v1 base URL")
     parser.add_argument(

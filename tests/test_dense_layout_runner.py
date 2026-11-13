@@ -15,7 +15,6 @@ imaging dependency).
 
 from __future__ import annotations
 
-import argparse
 import asyncio
 import importlib.util
 import json
@@ -129,7 +128,7 @@ def test_load_dataset_rejects_duplicate_manifest_entries(tmp_path: Path) -> None
 # --- scoring (needs jiwer) -------------------------------------------------------
 
 
-def test_score_image_perfect_transcription(tmp_path: Path) -> None:
+def test_score_image_perfect_extraction(tmp_path: Path) -> None:
     pytest.importorskip("jiwer")
     reference = "Region north 12 Region east 8 TOTAL 1284"
     scores = runner.score_image(reference, {"total": "1284"}, reference)
@@ -147,7 +146,7 @@ def test_score_image_ignores_whitespace_differences() -> None:
     assert scores["wer"] == 0.0
 
 
-def test_score_image_flags_wrong_transcription() -> None:
+def test_score_image_flags_wrong_extraction() -> None:
     pytest.importorskip("jiwer")
     scores = runner.score_image("Region north 12", {}, "Region south 13")
     assert scores["cer"] > 0
@@ -186,12 +185,12 @@ def test_score_image_without_fields_leaves_recall_null() -> None:
 # --- request classification (empty completion / truncation are errors) ----------
 
 
-def test_score_request_scores_a_valid_transcription() -> None:
+def test_score_request_scores_a_valid_extraction() -> None:
     pytest.importorskip("jiwer")
     entry = {"file": "pane.jpg", "label": "tables", "reference_text": "Alpha Beta", "fields": {}}
     record = runner.score_request(entry, 0, {"content": "Alpha Beta", "finish_reason": "stop"})
     assert record["error"] is None
-    assert record["transcription"] == "Alpha Beta"
+    assert record["extracted_text"] == "Alpha Beta"
     assert record["cer"] == 0.0
 
 
@@ -220,6 +219,30 @@ def test_score_request_propagates_transport_errors() -> None:
     entry = {"file": "pane.jpg", "label": "tables", "reference_text": "Alpha Beta", "fields": {}}
     record = runner.score_request(entry, 0, {"error": "ConnectError", "content": None})
     assert record["error"] == "ConnectError"
+
+
+def test_score_request_text_complete_false_skips_cer_and_wer() -> None:
+    # "text_complete": false in the answer exempts the image from CER/WER: the
+    # record stays a success with null cer/wer (never scored as 0), while
+    # field_recall and latency still score and the row counts in error_rate.
+    entry = {
+        "file": "pane.jpg",
+        "label": "tables",
+        "reference_text": "Alpha Beta",
+        "text_complete": False,
+        "fields": {"zip": "94107"},
+    }
+    response = {"content": "Alpha Beta ZIP 94107", "finish_reason": "stop", "latency_ms": 1200.0}
+    record = runner.score_request(entry, 0, response)
+    assert record["error"] is None
+    assert record["extracted_text"] == "Alpha Beta ZIP 94107"
+    assert record["cer"] is None and record["wer"] is None
+    assert record["field_recall"] == 1.0
+    block = runner.aggregate_records([record], wall_seconds=1.0)
+    assert block["cer"] is None and block["wer"] is None
+    assert block["field_recall"] == 1.0
+    assert block["seconds_per_image"] == 1.2
+    assert block["error_rate"] == 0.0
 
 
 # --- endpoint I/O (needs httpx) --------------------------------------------------
@@ -329,13 +352,23 @@ def test_run_pipeline_against_a_stub_endpoint(tmp_path: Path, monkeypatch: pytes
 
     monkeypatch.setitem(sys.modules, "httpx", FakeHttpx("httpx"))
 
-    args = argparse.Namespace(
-        base_url="http://127.0.0.1:1/v1",
-        model="m",
-        max_tokens=128,
-        concurrency=2,
-        repeats=2,
-        timeout=5.0,
+    # Args must come from the parser: _run reads every CLI default (api_key_env
+    # among them), and a hand-rolled Namespace would silently miss one.
+    args = runner.build_parser().parse_args(
+        [
+            "--base-url",
+            "http://127.0.0.1:1/v1",
+            "--model",
+            "m",
+            "--max-tokens",
+            "128",
+            "--concurrency",
+            "2",
+            "--repeats",
+            "2",
+            "--timeout",
+            "5.0",
+        ]
     )
     results = asyncio.run(runner._run(args, "2026-01-01T00:00:00Z"))
 

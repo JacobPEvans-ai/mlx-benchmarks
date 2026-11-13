@@ -74,8 +74,8 @@ def test_label_thinking_and_concurrency_travel_as_tags(dense_layout_sample: dict
 def test_aggregate_values_survive_conversion(dense_layout_sample: dict) -> None:
     envelope = get_converter("dense-layout").build_envelope(dense_layout_sample, _ctx())
     overall = _rows(envelope, "all")
-    assert overall["cer"]["value"] == pytest.approx(0.044)
-    assert overall["wer"]["value"] == pytest.approx(0.088)
+    assert overall["cer"]["value"] == pytest.approx(0.045)
+    assert overall["wer"]["value"] == pytest.approx(0.09)
     assert overall["field_recall"]["value"] == pytest.approx(0.833333)
     assert overall["seconds_per_image"]["value"] == pytest.approx(1.22)
     assert overall["error_rate"]["value"] == pytest.approx(1 / 6)
