@@ -26,34 +26,19 @@ enrichment rules, validator, and historical migration procedure.
 Allowed trigger values: `local`, `schedule`, `pr`, and `workflow_dispatch`.
 
 Closed suite set: `throughput`, `throughput-serving`, `ttft`, `mixed-context`,
-`elastic`, `max-context`, `tool-calling`, `code-accuracy`,
-`framework-eval`, `capability-comparison`, `coding`, `reasoning`,
-`knowledge`, `evalplus`, `math-hard`, `promptstack`, `grounded-summary`, plus the
-hardware baselines `gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under
-test: publish them with `--model hardware-baseline`). Framework evaluations can
-carry `results[].tags.domain` values `spl`, `tool-queries`, `agentic`, `triage`,
-or `homelab-access`. The `repo-qa` suite records deterministic answers to
-repository questions over packed context. The `dense-layout-image-text` suite
-scores how accurately an image-to-text model transcribes dense-layout images
-(many panes, tables, tab strips, form fields) served behind an
-OpenAI-compatible chat endpoint. Related runs reuse an existing
-suite that already describes the measurement; adding a suite means editing
-`schema.json` and filing a schema update PR.
-
-### `dense-layout-image-text` metrics
-
-The `dense-layout` converter publishes rows per `tags.label` (one per dataset
-label) plus an overall row under `tags.label: all`; every row also carries
-`tags.thinking: n/a` (these models have no thinking arm), `tags.concurrency`,
-and an explicit `tags.direction`.
-
-| `metric` | `unit` | Direction | Meaning |
-| --- | --- | --- | --- |
-| `cer` | `edit_distance_per_reference_char` | `lower_is_better` | Character error rate (jiwer) after whitespace normalisation. **Not bounded by 1** — a response longer than its reference scores above 1. |
-| `wer` | `edit_distance_per_reference_word` | `lower_is_better` | Word error rate (jiwer) after whitespace normalisation; unbounded above for the same reason. |
-| `field_recall` | `ratio` | `higher_is_better` | Share of reference field values found verbatim in the output (case-insensitive, whitespace-normalised). |
-| `seconds_per_image` | `seconds` | `lower_is_better` | Mean latency of successful transcription requests. |
-| `error_rate` | `ratio` | `lower_is_better` | Share of requests that errored, including empty completions and `finish_reason == "length"` (a truncated transcription is never a valid empty answer). |
+`elastic`, `max-context`, `tool-calling`, `code-accuracy`, `framework-eval`,
+`capability-comparison`, `coding`, `reasoning`, `knowledge`, `evalplus`,
+`math-hard`, `promptstack`, `grounded-summary`, plus the hardware baselines
+`gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under test: publish with
+`--model hardware-baseline`). Framework evaluations carry `results[].tags.domain`
+values `spl`, `tool-queries`, `agentic`, `triage`, `homelab-access`. The
+`repo-qa` suite records deterministic answers over packed repository context.
+The `dense-layout-image-text` suite (image-to-text extraction over dense-layout
+images) skips CER and WER for an answer file with `"text_complete": false`,
+scoring only field recall, latency, and error rate; a missing key means the
+extracted text is complete. Related runs reuse a suite that already describes
+the measurement; a new suite means editing `schema.json` and filing a schema
+update PR.
 
 ## Optional top-level fields
 
@@ -222,16 +207,12 @@ Sweep metadata may include:
 
 As of 2026-07-27, `total_tokens_per_second` — cumulative (prompt + completion)
 tokens divided by wall-clock duration — is the **primary** throughput number
-to report and compare, not `decode_tokens_per_second`. A decode-only rate
-hides prefill-engine improvements entirely, even though a faster prefill is a
-real, felt latency win for any caller sending a non-trivial prompt: two models
-with identical decode speed but a 4-6x prefill gap are not equivalent in
-practice, and a decode-only headline reports them as if they were.
-`decode_tokens_per_second` and `prompt_tokens_per_second` are kept as
-supporting detail (useful for root-causing *why* the cumulative number moved)
-— this is purely a description/policy change, no schema fields were added,
-removed, or renamed, so older published rows remain fully valid and
-comparable.
+to report and compare, not `decode_tokens_per_second`: a decode-only rate hides
+prefill-engine improvements entirely. `decode_tokens_per_second` and
+`prompt_tokens_per_second` remain supporting detail for root-causing *why* the
+cumulative number moved. This is a description/policy change only — no schema
+fields were added, removed, or renamed, so older published rows remain fully
+valid and comparable.
 
 ## Validation
 

@@ -27,10 +27,9 @@ still **provisional**: a verdict is final only per the
 [verdict policy](verdict-policy.md) (**≥4 runs ≥5 days apart, validated pairs,
 both environment classes**). Read it before any "best/worst" claim.
 
-`promptstack` and `factual` feed no `RANKINGS.md` row. Neither does
-`coding-replay`, a real-merged-PR replay suite — invocation and scoring rule in
-[`coding-replay.md`](coding-replay.md) — or `dense-layout-image-text`, an
-image-to-text transcription accuracy suite (below).
+`promptstack`, `factual`, `coding-replay` (real-merged-PR replay suite —
+invocation and scoring in [`coding-replay.md`](coding-replay.md)), and
+`dense-layout-image-text` (`harness/dense_layout/`) feed no `RANKINGS.md` row.
 
 ## Decision tree
 
@@ -238,36 +237,6 @@ ON, large context) — the multi-turn degradation track is where quants fail
 ([trap 5](benchmark-traps.md#trap-5-both-thinking-tracks)). Ship the winning
 track's serving config. Full grid + pass gate: [`agentic.md`](agentic.md).
 For router commands, see [cloud-router runs](cloud-router-runs.md).
-
-### 4f. Dense-layout image-text transcription (`--kind dense-layout --suite dense-layout-image-text`)
-
-For image-to-text models served behind an OpenAI-compatible
-`/v1/chat/completions` endpoint that accepts `image_url` content parts. The
-harness sends each dense-layout image once per repeat with a fixed transcription
-prompt and scores the transcription deterministically: CER/WER (lower is
-better, unbounded above), `field_recall`, `seconds_per_image`, `error_rate`.
-An empty completion or a `finish_reason` of `length` is a counted error and a
-non-zero exit — never a valid empty transcription.
-
-The image dataset lives outside the repo; point `DENSE_LAYOUT_DATASET_DIR` at
-a directory holding `manifest.json` (list of `{file, label}`),
-`images/<file>.jpg`, and `answers/<file>.json` (objects with `text` and
-optional `fields`). The serving stack must be running — this harness does not
-load the model itself:
-
-```sh
-DENSE_LAYOUT_DATASET_DIR=/path/to/dataset \
-uv run harness/dense_layout/run.py \
-  --base-url http://127.0.0.1:11434/v1 \
-  --api-key-env OPENAI_API_KEY \
-  --model <model-id> \
-  --concurrency 4 --repeats 2 \
-  --output run-output/dense_layout_<slug>.json
-```
-
-Publish exactly like any other suite (Step 5): dry-run first, then the real
-publish with `--kind dense-layout --suite dense-layout-image-text`. Rows are
-tagged `label`, `thinking: n/a`, and `concurrency`.
 
 ## Step 5 — Publish each shard
 
