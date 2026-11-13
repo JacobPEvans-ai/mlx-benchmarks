@@ -64,6 +64,11 @@ def vllm_bench_serve_nvidia_sample() -> dict[str, Any]:
 
 
 @pytest.fixture
+def guidellm_report() -> dict[str, Any]:
+    return json.loads((FIXTURES / "guidellm_benchmarks_report_synthetic.json").read_text())
+
+
+@pytest.fixture
 def fio_sample() -> dict[str, Any]:
     return json.loads((FIXTURES / "fio_randread_synthetic.json").read_text())
 

@@ -181,12 +181,36 @@ Run against the served endpoint. Timings are **one** 30B-A3B-class run — each
 suite runs as a **replicated pair** (×2) in **both** environment classes, so
 budget ~**4×**; discard + re-run a diverging pair.
 
-### 4a. Throughput (`--kind vllm|throughput-probe --suite throughput`)
+### 4a. Throughput (`--kind vllm|throughput-probe|guidellm --suite throughput`)
 
 - **Running server** — vllm `benchmark_serving` ([config](../configs/vllm/benchmark_serving.toml)).
 - **Load** — `mlx-bench` loads the model; server down first ([trap 4](benchmark-traps.md#trap-4-mlx-bench-loads-directly)).
 - **Local probe** — publish as `throughput-probe`: cumulative tok/s is headline;
   decode/prefill/TTFT support it. Capped results are not quality.
+- **Reasoning-on serving sweep** — GuideLLM
+  ([config](../configs/guidellm/thinking-on-sweep.toml)) re-measures the
+  running server with thinking **on** at concurrency 1/2/4/8, ~1k synthetic
+  prompt tokens, an 8192-token generation cap, a fixed window per level, and
+  two repeats per level. GuideLLM is an external tool (`pip install
+  "guidellm[recommended]"`; flags verified against the v0.8.1 docs). Run it
+  via the thin wrapper, which sequences one report per (level, repeat):
+
+  ```sh
+  scripts/run-guidellm-sweep.sh \
+    --base-url http://127.0.0.1:11434 \
+    --model <model-id> \
+    --api-key-env OPENAI_API_KEY \
+    --output-dir run-output/guidellm-<slug>
+  ```
+
+  Note the base URL is the server **root** (no `/v1`): GuideLLM takes the
+  request path from `request_format` instead. Publish each report with
+  `--kind guidellm --suite throughput`; rows are tagged `thinking=on` and
+  `concurrency=<n>` from the file. Judge answers on `ttfa_*` (first answer
+  token), not `ttft_*` (first reasoning token), and read
+  `truncated_or_empty_answers` as failures — responses that hit the
+  generation cap or returned no answer
+  ([schema notes](schema.md#guidellm-reasoning-on-serving-rows)).
 
 ### 4b. Coding (`--kind lm-eval --suite coding`) — ~3 h
 

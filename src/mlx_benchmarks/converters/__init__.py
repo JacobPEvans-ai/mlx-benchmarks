@@ -9,6 +9,7 @@ from mlx_benchmarks.converters.evalscope import EvalScopeConverter
 from mlx_benchmarks.converters.factual import FactualConverter
 from mlx_benchmarks.converters.fio import FioConverter
 from mlx_benchmarks.converters.gpu_burn import GpuBurnConverter
+from mlx_benchmarks.converters.guidellm import GuidellmConverter
 from mlx_benchmarks.converters.inspect_ai import InspectAIConverter
 from mlx_benchmarks.converters.llamacpp_server import LlamaCppServerConverter
 from mlx_benchmarks.converters.lm_eval import LmEvalConverter
@@ -32,6 +33,7 @@ __all__ = [
     "FactualConverter",
     "FioConverter",
     "GpuBurnConverter",
+    "GuidellmConverter",
     "InspectAIConverter",
     "KvOffloadConverter",
     "LlamaCppServerConverter",
@@ -62,6 +64,7 @@ def get_converter(kind: str) -> Converter:
         "evalscope": EvalScopeConverter,
         "factual": FactualConverter,
         "fio": FioConverter,
+        "guidellm": GuidellmConverter,
         "gpu-burn": GpuBurnConverter,
         "inspect-ai": InspectAIConverter,
         "llamacpp-server": LlamaCppServerConverter,

@@ -65,6 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
             "evalscope",
             "factual",
             "fio",
+            "guidellm",
             "gpu-burn",
             "inspect-ai",
             "kv-offload",

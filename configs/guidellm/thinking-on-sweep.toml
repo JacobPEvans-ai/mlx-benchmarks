@@ -1,0 +1,97 @@
+# Reasoning-on serving sweep: GuideLLM closed-loop concurrency levels.
+#
+# Upstream tool: GuideLLM (https://github.com/vllm-project/guidellm). CLI and
+# output format verified against the v0.8.1 docs and report schema — the
+# current `guidellm run` registry-style syntax (the pre-0.7 `guidellm
+# benchmark --target/--rate-type` flags are gone). GuideLLM is NOT a
+# dependency of this repo; install it in your own environment. This repo owns
+# conversion: `--kind guidellm` parses the `benchmarks.json` report it writes.
+#
+# WHY THIS SWEEP EXISTS: every throughput row published so far measured
+# serving with model reasoning switched off. Production serves these models
+# with reasoning ON, which changes decode mix, sequence lengths, and
+# time-to-first-answer. This sweep re-measures serving throughput with
+# thinking on, at matched concurrency levels, via a standard open-source load
+# generator instead of new load-generation code.
+#
+# Chat completions + thinking on has two consequences the flags below encode:
+#   1. GuideLLM's OpenAI backend defaults to `ignore_eos: true` for
+#      fixed-length output measurement. With reasoning on we want the model
+#      to stop at its own EOS, so the run overrides `ignore_eos: false` and
+#      caps generation at `max_tokens` instead. Responses that hit the cap
+#      (finish_reason "length") or return an empty answer are failures and
+#      the converter counts them (see docs/schema.md).
+#   2. `time_to_first_token_ms` covers the first token of ANY kind — with
+#      thinking on that is a reasoning token. GuideLLM separately reports
+#      `time_to_first_output_token_ms` (first non-reasoning token); the
+#      converter publishes that as `ttfa_*` (time to first answer).
+#
+# Endpoint shape: GuideLLM's `target` is the server ROOT (no /v1 path); the
+# request path comes from `request_format=/v1/chat/completions`. This differs
+# from the repo's other tools, whose base_url includes /v1.
+#
+# $GUIDELLM_TARGET is the server root on the benchmark host — keep it an env
+# var: this file must carry no real hostname. One actor per host: never run a
+# sweep while another bench is in flight. Concurrency levels must not exceed
+# the endpoint's deployed concurrency limit — excess requests are rejected or
+# queued and the level measures a load the server never accepted
+# (benchmark-traps.md Trap 11).
+
+# Documentation of the sweep, mirrored in [run]. Nothing reads this table.
+[matrix]
+concurrency = [1, 2, 4, 8] # closed-loop in-flight request count per level
+prompt_tokens = 1000 # synthetic prompt target (about 1k tokens per request)
+max_tokens = 8192 # generation cap: reasoning + answer must fit (see notes)
+duration_seconds = 300 # fixed measured window per level
+repeats = 2 # consecutive pair per level (verdict-policy Gate 2); a divergent pair is discarded
+
+[run]
+# One invocation per (level, repeat) pair: each writes ONE benchmark entry,
+# which is exactly what the `--kind guidellm` converter accepts. The report
+# records the profile, streams, constraints, and data args, so the output
+# file is self-describing.
+#
+# --seed varies per repeat so the synthetic prompts differ between the two
+# halves of a pair even if the serving cache were warm.
+command = """
+for C in 1 2 4 8; do
+  for REP in 1 2; do
+    guidellm run \
+      --backend kind=openai_http,target=$GUIDELLM_TARGET,model=$MODEL,request_format=/v1/chat/completions,extras.body.max_tokens=8192,extras.body.ignore_eos=false \
+      --profile kind=concurrent,streams=$C,warmup=0.1,cooldown=0.05 \
+      --constraint kind=max_duration,seconds=300 \
+      --data kind=synthetic_text,prompt_tokens=1000 \
+      --seed kind=static,value=$REP \
+      --output kind=json,path=run-output/guidellm_${MODEL_SLUG}_c${C}_r${REP}.json
+  done
+done
+"""
+
+# API key: pass `api_key=<value>` in --backend only when the endpoint needs
+# one. scripts/run-guidellm-sweep.sh reads it from an env var NAME (never a
+# value on the command line it echoes) and omits the arg entirely when unset.
+
+[run.smoke]
+command = """
+guidellm run \
+  --backend kind=openai_http,target=$GUIDELLM_TARGET,model=$MODEL,request_format=/v1/chat/completions,extras.body.max_tokens=256,extras.body.ignore_eos=false \
+  --profile kind=concurrent,streams=1,warmup=0.1,cooldown=0.05 \
+  --constraint kind=max_duration,seconds=30 \
+  --data kind=synthetic_text,prompt_tokens=1000 \
+  --output kind=json,path=run-output/guidellm_${MODEL_SLUG}_smoke.json
+"""
+
+# One call per (level, repeat) report. Dry-run first (add --dry-run). The
+# converter derives the per-row tags from the report itself: thinking=on and
+# concurrency=<streams> come off the file, as do request/error/failure
+# counts — do not re-state them as --tag here. $ENV_CLASS is `isolated` or
+# `under-load` (verdict-policy Gate 3); publish one shard per report.
+[publish]
+command = """
+mlx-bench-publish run-output/guidellm_${MODEL_SLUG}_c${C}_r${REP}.json \
+  --kind guidellm --suite throughput --model $MODEL \
+  --env-class $ENV_CLASS \
+  --serving-stack $SERVING_STACK --serving-model $MODEL \
+  --campaign-dimensions run-output/published-campaign-dimensions.json \
+  --published-metadata run-output/published-metadata.json
+"""

@@ -112,10 +112,13 @@ breakdown, data-flow, and CI diagrams.
 ## Upstream tools wired in
 
 Accuracy and throughput suites run on external tools —
-[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) and
-[vllm `benchmark_serving`](https://docs.vllm.ai/en/latest/performance/benchmarks.html)
-— invoked through thin `uvx` wrappers in the serving stack (nix-ai `mlx-eval` /
-`mlx-bench`), not scripts in this repo. The `tool-calling`, `promptstack`, and
+[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness),
+[vllm `benchmark_serving`](https://docs.vllm.ai/en/latest/performance/benchmarks.html),
+and [GuideLLM](https://github.com/vllm-project/guidellm) (the reasoning-on
+serving sweep) — none installed by this repo: lm-eval and benchmark_serving
+are invoked through thin `uvx` wrappers in the serving stack (nix-ai
+`mlx-eval` / `mlx-bench`), GuideLLM through
+`scripts/run-guidellm-sweep.sh`. The `tool-calling`, `promptstack`, and
 `grounded-summary` suites are the exceptions: standalone PEP 723 runners under
 `harness/`, documented in [`docs/agentic.md`](docs/agentic.md),
 [`docs/promptstack.md`](docs/promptstack.md), and
