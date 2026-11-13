@@ -376,9 +376,7 @@ async def run_entry(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Dense-layout image-to-text extraction accuracy benchmark"
-    )
+    parser = argparse.ArgumentParser(description="Dense-layout image-to-text extraction accuracy benchmark")
     parser.add_argument("--base-url", required=True, help="OpenAI-compatible /v1 base URL")
     parser.add_argument(
         "--api-key-env",
