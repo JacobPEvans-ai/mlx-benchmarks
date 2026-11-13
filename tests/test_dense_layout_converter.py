@@ -78,7 +78,9 @@ def test_aggregate_values_survive_conversion(dense_layout_sample: dict) -> None:
     assert overall["wer"]["value"] == pytest.approx(0.09)
     assert overall["field_recall"]["value"] == pytest.approx(0.833333)
     assert overall["seconds_per_image"]["value"] == pytest.approx(1.22)
-    assert overall["error_rate"]["value"] == pytest.approx(1 / 6)
+    # The harness writes aggregates rounded to 6 decimals; assert that value,
+    # not the unrounded 1/6, which sits outside pytest.approx's tolerance.
+    assert overall["error_rate"]["value"] == pytest.approx(round(1 / 6, 6))
     tables = _rows(envelope, "tables")
     assert tables["error_rate"]["value"] == pytest.approx(0.25)
     assert tables["cer"]["value"] == pytest.approx(0.033333)
