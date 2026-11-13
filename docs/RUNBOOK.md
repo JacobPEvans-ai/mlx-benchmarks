@@ -27,9 +27,9 @@ still **provisional**: a verdict is final only per the
 [verdict policy](verdict-policy.md) (**≥4 runs ≥5 days apart, validated pairs,
 both environment classes**). Read it before any "best/worst" claim.
 
-`promptstack` and `factual` feed no `RANKINGS.md` row. Neither does
-`coding-replay`, a real-merged-PR replay suite — invocation and scoring rule in
-[`coding-replay.md`](coding-replay.md).
+`promptstack`, `factual`, `coding-replay` (real-merged-PR replay suite —
+invocation and scoring in [`coding-replay.md`](coding-replay.md)), and
+`dense-layout-image-text` (`harness/dense_layout/`) feed no `RANKINGS.md` row.
 
 ## Decision tree
 

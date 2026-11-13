@@ -26,16 +26,19 @@ enrichment rules, validator, and historical migration procedure.
 Allowed trigger values: `local`, `schedule`, `pr`, and `workflow_dispatch`.
 
 Closed suite set: `throughput`, `throughput-serving`, `ttft`, `mixed-context`,
-`elastic`, `max-context`, `tool-calling`, `code-accuracy`,
-`framework-eval`, `capability-comparison`, `coding`, `reasoning`,
-`knowledge`, `evalplus`, `math-hard`, `promptstack`, `grounded-summary`, plus the
-hardware baselines `gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under
-test: publish them with `--model hardware-baseline`). Framework evaluations can
-carry `results[].tags.domain` values `spl`, `tool-queries`, `agentic`, `triage`,
-or `homelab-access`. The `repo-qa` suite records deterministic answers to
-repository questions over packed context. Related runs reuse an existing
-suite that already describes the measurement; adding a suite means editing
-`schema.json` and filing a schema update PR.
+`elastic`, `max-context`, `tool-calling`, `code-accuracy`, `framework-eval`,
+`capability-comparison`, `coding`, `reasoning`, `knowledge`, `evalplus`,
+`math-hard`, `promptstack`, `grounded-summary`, plus the hardware baselines
+`gpu-burn`, `nvbandwidth`, `mbw` and `fio` (no model under test: publish with
+`--model hardware-baseline`). Framework evaluations carry `results[].tags.domain`
+values `spl`, `tool-queries`, `agentic`, `triage`, `homelab-access`. The
+`repo-qa` suite records deterministic answers over packed repository context.
+The `dense-layout-image-text` suite (image-to-text extraction over dense-layout
+images) skips CER and WER for an answer file with `"text_complete": false`,
+scoring only field recall, latency, and error rate; a missing key means the
+extracted text is complete. Related runs reuse a suite that already describes
+the measurement; a new suite means editing `schema.json` and filing a schema
+update PR.
 
 ## Optional top-level fields
 
@@ -204,16 +207,12 @@ Sweep metadata may include:
 
 As of 2026-07-27, `total_tokens_per_second` — cumulative (prompt + completion)
 tokens divided by wall-clock duration — is the **primary** throughput number
-to report and compare, not `decode_tokens_per_second`. A decode-only rate
-hides prefill-engine improvements entirely, even though a faster prefill is a
-real, felt latency win for any caller sending a non-trivial prompt: two models
-with identical decode speed but a 4-6x prefill gap are not equivalent in
-practice, and a decode-only headline reports them as if they were.
-`decode_tokens_per_second` and `prompt_tokens_per_second` are kept as
-supporting detail (useful for root-causing *why* the cumulative number moved)
-— this is purely a description/policy change, no schema fields were added,
-removed, or renamed, so older published rows remain fully valid and
-comparable.
+to report and compare, not `decode_tokens_per_second`: a decode-only rate hides
+prefill-engine improvements entirely. `decode_tokens_per_second` and
+`prompt_tokens_per_second` remain supporting detail for root-causing *why* the
+cumulative number moved. This is a description/policy change only — no schema
+fields were added, removed, or renamed, so older published rows remain fully
+valid and comparable.
 
 ## Validation
 

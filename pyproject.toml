@@ -40,6 +40,8 @@ inspect = ["inspect-ai>=0.3.281"]
 dev = [
     # harness/agentic/run.py imports httpx; the PEP 723 header covers script runs, this covers pytest.
     "httpx>=0.28.1",
+    # harness/dense_layout/run.py imports jiwer; the PEP 723 header covers script runs, this covers pytest.
+    "jiwer>=3.0",
     "inspect-ai>=0.3.281",
     "pyright>=1.1.411",
     "pre-commit>=4.6.2",

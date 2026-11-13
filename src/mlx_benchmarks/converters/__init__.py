@@ -5,6 +5,7 @@ from mlx_benchmarks.converters.agentic_partial import AgenticPartialConverter
 from mlx_benchmarks.converters.base import Converter, ConverterContext
 from mlx_benchmarks.converters.bench_serve import BenchServeConverter
 from mlx_benchmarks.converters.coding_replay import CodingReplayConverter
+from mlx_benchmarks.converters.dense_layout import DenseLayoutConverter
 from mlx_benchmarks.converters.evalscope import EvalScopeConverter
 from mlx_benchmarks.converters.factual import FactualConverter
 from mlx_benchmarks.converters.fio import FioConverter
@@ -28,6 +29,7 @@ __all__ = [
     "CodingReplayConverter",
     "Converter",
     "ConverterContext",
+    "DenseLayoutConverter",
     "EvalScopeConverter",
     "FactualConverter",
     "FioConverter",
@@ -59,6 +61,7 @@ def get_converter(kind: str) -> Converter:
         "agentic-partial": AgenticPartialConverter,
         "bench-serve": BenchServeConverter,
         "coding-replay": CodingReplayConverter,
+        "dense-layout": DenseLayoutConverter,
         "evalscope": EvalScopeConverter,
         "factual": FactualConverter,
         "fio": FioConverter,
