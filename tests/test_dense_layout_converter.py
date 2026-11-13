@@ -135,8 +135,10 @@ def test_cli_dry_run_accepts_the_committed_fixture(
             "dense-layout-image-text",
             "--git-sha",
             "deadbeef",
+            # Must match published_metadata.start_utc: the publisher validates
+            # that the envelope date equals the recorded run start.
             "--timestamp",
-            "2026-11-13T00:00:00Z",
+            "2026-04-24T18:30:00Z",
             "--published-metadata",
             str(metadata_path),
             "--dry-run",

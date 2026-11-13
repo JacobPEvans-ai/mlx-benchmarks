@@ -1,6 +1,7 @@
 {
   "benchmark": "dense-layout",
   "model": "example-dense-layout-2b",
+  "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "timestamp": "2026-11-13T00:00:00Z",
   "config": {
     "base_url": "http://127.0.0.1:11434/v1",
