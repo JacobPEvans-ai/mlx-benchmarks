@@ -98,6 +98,16 @@ for result rows.
 15. **Dates.** Write evaluation deadlines as full ISO dates, such as
     `2026-10-17`.
 
+16. **Headline throughput metric.** Report and compare
+    `total_tokens_per_second` — cumulative (prompt + completion) tokens
+    divided by wall-clock duration — as the **primary** throughput number,
+    not `decode_tokens_per_second`: a decode-only rate hides prefill engine
+    improvements entirely. `decode_tokens_per_second` and
+    `prompt_tokens_per_second` remain supporting detail for root-causing
+    *why* the cumulative number moved. This is a description/policy rule
+    only — no schema fields were added, removed, or renamed, so older
+    published rows remain fully valid and comparable (since 2026-07-27).
+
 ## KV-cache and host-memory standards
 
 Rows use the [HF

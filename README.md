@@ -62,60 +62,19 @@ serving and evaluation execution to external tools:
 
 The repo owns the **envelope contract** (`schema.json`), the **publisher**
 (`mlx-bench-publish`), and the **converters** that fan in from each upstream
-evaluation tool. Its own data flow:
-
-```mermaid
-%%{init: {
-  'theme':'base',
-  'look':'handDrawn',
-  'themeVariables':{
-    'fontFamily':'Geist',
-    'fontSize':'14px',
-    'primaryColor':'#102937',
-    'primaryTextColor':'#F4EFE6',
-    'primaryBorderColor':'#4FB3A9',
-    'lineColor':'#4FB3A9',
-    'secondaryColor':'#0B1D2A',
-    'tertiaryColor':'#1A2A38',
-    'clusterBkg':'rgba(79,179,169,0.08)',
-    'clusterBorder':'#4FB3A9'
-  }
-}}%%
-flowchart LR
-  Raw(["raw results_*.json"])
-  Convert([converter])
-  Envelope([validated envelope])
-  Publish([mlx-bench-publish])
-  Dataset[("HF dataset")]
-  Viewer([HF Space viewer])
-
-  Raw -->|"convert"| Convert
-  Convert -->|"build_envelope"| Envelope
-  Envelope -->|"schema check"| Publish
-  Publish -->|"parquet upload"| Dataset
-  Dataset --> Viewer
-
-  classDef source fill:#102937,stroke:#E06B4A,stroke-width:2.5px,color:#F4EFE6;
-  classDef core   fill:#102937,stroke:#4FB3A9,stroke-width:3px,color:#F4EFE6;
-  classDef sink   fill:#102937,stroke:#F4EFE6,stroke-width:2.5px,color:#F4EFE6;
-
-  class Raw source
-  class Convert,Envelope,Publish core
-  class Dataset,Viewer sink
-
-  linkStyle 0,1,2,3,4 stroke:#4FB3A9,stroke-width:2px;
-```
-
-See [`docs/architecture.md`](docs/architecture.md) for the detailed component
-breakdown, data-flow, and CI diagrams.
+evaluation tool. See [`docs/architecture.md`](docs/architecture.md) for the
+component breakdown, the data-flow diagram, and the CI diagrams.
 
 ## Upstream tools wired in
 
 Accuracy and throughput suites run on external tools —
-[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) and
-[vllm `benchmark_serving`](https://docs.vllm.ai/en/latest/performance/benchmarks.html)
-— invoked through thin `uvx` wrappers in the serving stack (nix-ai `mlx-eval` /
-`mlx-bench`), not scripts in this repo. The `tool-calling`, `promptstack`, and
+[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness),
+[vllm `benchmark_serving`](https://docs.vllm.ai/en/latest/performance/benchmarks.html),
+and [GuideLLM](https://github.com/vllm-project/guidellm) (the reasoning-on
+serving sweep) — none installed by this repo: lm-eval and benchmark_serving
+are invoked through thin `uvx` wrappers in the serving stack (nix-ai
+`mlx-eval` / `mlx-bench`), GuideLLM through
+`scripts/run-guidellm-sweep.sh`. The `tool-calling`, `promptstack`, and
 `grounded-summary` suites are the exceptions: standalone PEP 723 runners under
 `harness/`, documented in [`docs/agentic.md`](docs/agentic.md),
 [`docs/promptstack.md`](docs/promptstack.md), and
