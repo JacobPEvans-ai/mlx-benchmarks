@@ -183,7 +183,7 @@ class GuidellmConverter:
             if value is not None:
                 row = _row(metric, value, "count", None, base_tags)
                 if metric == "requests_incomplete" and value > 0:
-                    row["tags"]["note"] = "cancelled at the measurement boundary"
+                    row.setdefault("tags", {})["note"] = "cancelled at the measurement boundary"
                 results.append(row)
 
         # Completed responses that ended at the max_tokens cap (finish_reason
@@ -192,15 +192,16 @@ class GuidellmConverter:
         successful = _number(request_totals.get("successful"))
         if failed > 0 or max_tokens is not None:
             row = _row("truncated_or_empty_answers", float(failed), "count", None, base_tags)
-            row["tags"]["failed_truncated"] = str(failures["truncated"])
-            row["tags"]["failed_empty_answers"] = str(failures["empty"])
+            row_tags = row.setdefault("tags", {})
+            row_tags["failed_truncated"] = str(failures["truncated"])
+            row_tags["failed_empty_answers"] = str(failures["empty"])
             if failed > 0 and successful is not None and successful > 0:
                 row["truncation_rate"] = failed / successful
             results.append(row)
 
         if results:
             headline = next(
-                (row for row in results if row["metric"] == "throughput_output_toks_per_s"),
+                (row for row in results if row.get("metric") == "throughput_output_toks_per_s"),
                 results[0],
             )
             for field, path, summary_key in (
