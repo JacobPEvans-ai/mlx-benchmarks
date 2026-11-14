@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.73.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.72.0...v0.73.0) (2026-11-14)
+
+
+### Features
+
+* add GuideLLM reasoning-on serving sweep with converter ([#529](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/529)) ([906b64a](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/906b64a50cb9c5b8f83c9f6cf6beee8b1255d647))
+
 ## [0.72.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.71.0...v0.72.0) (2026-11-13)
 
 
