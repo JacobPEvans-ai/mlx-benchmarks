@@ -132,48 +132,9 @@ Don't edit the swap config mid-run.
 ### Option B — solo `vllm-mlx serve` in a managed window (Studio) = isolated class
 
 When the model isn't in the swap config, or you need the whole machine's memory
-for one large model, take a **managed window** on the Studio. This takes
-production serving (the Hermes brain) offline, so:
-
-> **Notify the user before opening a managed window, and restore after.**
-> Production Hermes is down for the duration.
-
-With session approval for benchmark priority, log approval, window start/end,
-services paused/restored, and readiness in the task. Approval never waives
-paired, context, concurrency, or environment rules.
-
-```sh
-# 1. Bootout serving AND everything that could relaunch it mid-window
-#    (the 30s mlx-night.watcher agent; KeepAlive resurrects a plain `kill`).
-for a in vllm-mlx.server mlx-night.watcher mlx-night.rank mlx-night.prefetch; do
-  launchctl bootout "gui/501/dev.$a" 2>/dev/null || true
-done
-# Rotation flips (00:00Z/12:00Z) need no pause: their curls fail harmlessly.
-# To freeze across flips, touch the per-router rotation-paused sentinel
-# (apps docs/BRAIN_ROTATION.md). Permanent policy = ai_rotation_enabled.
-
-# 2. Serve the target model solo (parser flags from the parser map + Step 2)
-vllm-mlx serve <model-id> \
-  --port 11434 \
-  --tool-call-parser <parser> \
-  --reasoning-parser <parser> \
-  --gpu-memory-utilization 0.80 \
-  --timeout 3600
-
-# 3. ... run your suites against http://127.0.0.1:11434/v1 ...
-
-# 4. Restore (server first; the warmup agent re-faults the residents)
-for a in vllm-mlx.server vllm-mlx.warmup mlx-night.watcher mlx-night.rank mlx-night.prefetch; do
-  launchctl bootstrap gui/501 ~/Library/LaunchAgents/dev.$a.plist 2>/dev/null || true
-done
-
-# 5. Verify before closing the window: every resident "ready"
-curl -s http://127.0.0.1:11434/running
-```
-
-Mind the [serving flags that bite](benchmark-traps.md#serving-flags-that-bite).
-On the Studio, HF auth may be unset — a model that needs downloading reads
-`HF_TOKEN` (cache on `/Volumes/HuggingFace`).
+for one large model: pause production, serve solo, restore. The full
+procedure — approval rules, bootout/bootstrap order, and the readiness check —
+is in [`managed-window.md`](managed-window.md).
 
 ## Step 4 — Run the required suites
 
@@ -181,12 +142,16 @@ Run against the served endpoint. Timings are **one** 30B-A3B-class run — each
 suite runs as a **replicated pair** (×2) in **both** environment classes, so
 budget ~**4×**; discard + re-run a diverging pair.
 
-### 4a. Throughput (`--kind vllm|throughput-probe --suite throughput`)
+### 4a. Throughput (`--kind vllm|throughput-probe|guidellm --suite throughput`)
 
 - **Running server** — vllm `benchmark_serving` ([config](../configs/vllm/benchmark_serving.toml)).
 - **Load** — `mlx-bench` loads the model; server down first ([trap 4](benchmark-traps.md#trap-4-mlx-bench-loads-directly)).
 - **Local probe** — publish as `throughput-probe`: cumulative tok/s is headline;
   decode/prefill/TTFT support it. Capped results are not quality.
+- **Reasoning-on serving sweep** — GuideLLM re-measures the running server
+  with thinking **on** at concurrency 1/2/4/8; the wrapper invocation,
+  publish flags, and published-row semantics are in
+  [`guidellm-sweep.md`](guidellm-sweep.md).
 
 ### 4b. Coding (`--kind lm-eval --suite coding`) — ~3 h
 

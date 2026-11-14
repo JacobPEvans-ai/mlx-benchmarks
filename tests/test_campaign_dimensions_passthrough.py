@@ -96,6 +96,7 @@ RAW_BY_KIND: dict[str, tuple[str, Callable[[pytest.FixtureRequest], Any]]] = {
     "factual": ("grounded-summary", lambda r: r.getfixturevalue("factual_sample")),
     "fio": ("fio", lambda r: r.getfixturevalue("fio_sample")),
     "gpu-burn": ("gpu-burn", lambda r: r.getfixturevalue("gpu_burn_sample")),
+    "guidellm": ("throughput", lambda r: r.getfixturevalue("guidellm_report")),
     "inspect-ai": (
         "reasoning",
         lambda _: {
@@ -163,6 +164,16 @@ def test_converter_keeps_declared_campaign_dimensions(kind: str, request: pytest
         actual_reasons = envelope["dimension_null_reasons"]
         assert {key: actual_reasons[key] for key in NULL_REASONS} == NULL_REASONS
         assert any(key.startswith("speed.") for key in actual_reasons)
+    elif kind == "guidellm":
+        # The report is ground truth: its measured run and speed categories
+        # replace any declared ones; the other declared categories pass through.
+        actual_dimensions = envelope["campaign_dimensions"]
+        for category in ("hardware", "software", "model", "quality"):
+            assert actual_dimensions[category] == DIMENSIONS[category]
+        assert actual_dimensions["run"]["concurrent_agents"] == 4
+        assert actual_dimensions["run"]["thinking"] is True
+        assert actual_dimensions["speed"]["aggregate_output_tokens_per_second"] == pytest.approx(198.2)
+        assert envelope["dimension_null_reasons"] == NULL_REASONS
     else:
         assert envelope["campaign_dimensions"] == DIMENSIONS
         assert envelope["dimension_null_reasons"] == NULL_REASONS
@@ -183,6 +194,9 @@ def test_converter_leaves_dimensions_absent_when_none_are_declared(
         assert "campaign_dimensions" in envelope
         assert "speed" in envelope["campaign_dimensions"]
         assert "dimension_null_reasons" in envelope
+    elif kind == "guidellm":
+        assert "campaign_dimensions" in envelope
+        assert "dimension_null_reasons" not in envelope
     else:
         assert "campaign_dimensions" not in envelope
         assert "dimension_null_reasons" not in envelope

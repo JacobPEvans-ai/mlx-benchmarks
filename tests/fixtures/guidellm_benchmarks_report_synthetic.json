@@ -1,0 +1,486 @@
+{
+  "metadata": {
+    "version": "2",
+    "guidellm_version": "0.8.1",
+    "python_version": "3.13.5",
+    "platform": "linux"
+  },
+  "config": {
+    "id_": "00000000-0000-4000-8000-000000000001",
+    "run_id": "00000000-0000-4000-8000-000000000000",
+    "run_index": 1,
+    "strategy": {
+      "type_": "concurrent",
+      "worker_count": 1,
+      "max_concurrency": null,
+      "prefetch": null,
+      "streams": 4,
+      "rampup_duration": 0.0
+    },
+    "constraints": {
+      "max_duration": {"seconds": 60}
+    },
+    "sample_size": null,
+    "prefer_response_metrics": true,
+    "slo": null,
+    "confidence": 0.95,
+    "warnings": [],
+    "profile": {"type_": "concurrent", "streams": 4},
+    "requests": {},
+    "backend": {
+      "type_": "openai_http",
+      "target": "http://localhost:8000",
+      "model": "example-org/example-model",
+      "request_format": "/v1/chat/completions",
+      "api_key": null,
+      "stream": true,
+      "verify": null,
+      "timeout": 240.0,
+      "extras": {
+        "body": {
+          "max_tokens": 8192,
+          "ignore_eos": false
+        }
+      }
+    },
+    "environment": {}
+  },
+  "benchmarks": [
+    {
+      "type_": "generative_benchmark",
+      "config": {
+        "id_": "00000000-0000-4000-8000-000000000001",
+        "run_id": "00000000-0000-4000-8000-000000000000",
+        "run_index": 1,
+        "strategy": {
+          "type_": "concurrent",
+          "worker_count": 1,
+          "max_concurrency": null,
+          "prefetch": null,
+          "streams": 4,
+          "rampup_duration": 0.0
+        },
+        "constraints": {
+          "max_duration": {"seconds": 60}
+        },
+        "sample_size": null,
+        "prefer_response_metrics": true,
+        "slo": null,
+        "confidence": 0.95,
+        "warnings": [],
+        "profile": {"type_": "concurrent", "streams": 4},
+        "requests": {},
+        "backend": {
+          "type_": "openai_http",
+          "target": "http://localhost:8000",
+          "model": "example-org/example-model",
+          "request_format": "/v1/chat/completions",
+          "api_key": null,
+          "stream": true,
+          "verify": null,
+          "timeout": 240.0,
+          "extras": {
+            "body": {
+              "max_tokens": 8192,
+              "ignore_eos": false
+            }
+          }
+        },
+        "environment": {}
+      },
+      "scheduler_state": {},
+      "scheduler_metrics": {
+        "start_time": 1764500000.0,
+        "request_start_time": 1764500001.5,
+        "measure_start_time": 1764500006.0,
+        "measure_end_time": 1764500066.0,
+        "request_end_time": 1764500068.0,
+        "end_time": 1764500070.0,
+        "requests_made": {"successful": 6, "incomplete": 2, "errored": 1, "total": 9},
+        "strategy_type": "concurrent"
+      },
+      "metrics": {
+        "request_totals": {"successful": 6, "incomplete": 2, "errored": 1, "total": 9},
+        "requests_per_second": {
+          "successful": {"mean": 0.1236, "count": 6},
+          "incomplete": {"mean": 0.0333, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 0.15, "count": 9}
+        },
+        "request_concurrency": {
+          "successful": {"mean": 3.4, "median": 3.5, "count": 6},
+          "incomplete": {"mean": 0.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 2.55, "count": 9}
+        },
+        "request_latency": {
+          "successful": {
+            "mean": 27.5,
+            "median": 26.0,
+            "min": 3.0,
+            "max": 55.1,
+            "count": 6,
+            "percentiles": {"p50": 26.0, "p90": 48.2, "p99": 55.1}
+          },
+          "incomplete": {"mean": 2.1, "count": 2},
+          "errored": {"mean": 0.5, "count": 1},
+          "total": {"mean": 18.7, "count": 9}
+        },
+        "prompt_token_count": {
+          "successful": {
+            "mean": 1002.4,
+            "median": 1001.0,
+            "min": 998.0,
+            "max": 1011.0,
+            "count": 6,
+            "percentiles": {"p50": 1001.0, "p90": 1009.0, "p99": 1011.0}
+          },
+          "incomplete": {"mean": 1000.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 835.1, "count": 9}
+        },
+        "output_token_count": {
+          "successful": {
+            "mean": 1982.0,
+            "median": 900.0,
+            "min": 100.0,
+            "max": 8192.0,
+            "count": 6,
+            "percentiles": {"p50": 900.0, "p90": 8192.0, "p99": 8192.0}
+          },
+          "incomplete": {"mean": 500.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 1432.4, "count": 9}
+        },
+        "total_token_count": {
+          "successful": {
+            "mean": 2984.4,
+            "median": 1901.0,
+            "min": 1101.0,
+            "max": 9203.0,
+            "count": 6,
+            "percentiles": {"p50": 1901.0, "p90": 9203.0, "p99": 9203.0}
+          },
+          "incomplete": {"mean": 1500.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 2267.6, "count": 9}
+        },
+        "time_to_first_token_ms": {
+          "successful": {
+            "mean": 210.0,
+            "median": 198.0,
+            "min": 121.0,
+            "max": 402.0,
+            "count": 6,
+            "percentiles": {"p50": 198.0, "p90": 402.0, "p99": 512.5}
+          },
+          "incomplete": {"mean": 190.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 201.4, "count": 9}
+        },
+        "time_to_first_output_token_ms": {
+          "successful": {
+            "mean": 18120.0,
+            "median": 18742.0,
+            "min": 980.0,
+            "max": 41290.0,
+            "count": 6,
+            "percentiles": {"p50": 18742.0, "p90": 39800.0, "p99": 41305.0}
+          },
+          "incomplete": {"mean": 18400.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 15093.3, "count": 9}
+        },
+        "time_per_output_token_ms": {
+          "successful": {
+            "mean": 1.2,
+            "median": 1.18,
+            "min": 1.02,
+            "max": 1.9,
+            "count": 6,
+            "percentiles": {"p50": 1.18, "p90": 1.7, "p99": 1.9}
+          },
+          "incomplete": {"mean": 1.3, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 1.21, "count": 9}
+        },
+        "inter_token_latency_ms": {
+          "successful": {
+            "mean": 1.1,
+            "median": 1.1,
+            "min": 0.98,
+            "max": 1.6,
+            "count": 6,
+            "percentiles": {"p50": 1.1, "p90": 1.55, "p99": 1.6}
+          },
+          "incomplete": {"mean": 1.2, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 1.1, "count": 9}
+        },
+        "prompt_tokens_per_second": {
+          "successful": {"mean": 100.25, "count": 6},
+          "incomplete": {"mean": 33.3, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 92.9, "count": 9}
+        },
+        "output_tokens_per_second": {
+          "successful": {"mean": 198.2, "count": 6},
+          "incomplete": {"mean": 16.7, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 190.5, "count": 9}
+        },
+        "tokens_per_second": {
+          "successful": {"mean": 298.45, "count": 6},
+          "incomplete": {"mean": 50.0, "count": 2},
+          "errored": {"mean": 0.0, "count": 1},
+          "total": {"mean": 279.8, "count": 9}
+        },
+        "text": {
+          "usage": {
+            "input": {
+              "successful": {"mean": 1002.4, "median": 1001.0, "count": 6},
+              "incomplete": {"mean": 1000.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 835.1, "count": 9}
+            },
+            "output": {
+              "successful": {"mean": 1982.0, "median": 900.0, "count": 6},
+              "incomplete": {"mean": 500.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 1432.4, "count": 9}
+            },
+            "reasoning": {
+              "successful": {"mean": 1600.0, "median": 520.0, "count": 6},
+              "incomplete": {"mean": 400.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 1200.0, "count": 9}
+            },
+            "total": {
+              "successful": {"mean": 2984.4, "median": 1901.0, "count": 6},
+              "incomplete": {"mean": 1500.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 2267.6, "count": 9}
+            },
+            "input_per_second": {
+              "successful": {"mean": 100.25, "count": 6},
+              "incomplete": {"mean": 33.3, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 92.9, "count": 9}
+            },
+            "output_per_second": {
+              "successful": {"mean": 66.0, "median": 42.1, "count": 6},
+              "incomplete": {"mean": 30.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 63.2, "count": 9}
+            },
+            "reasoning_per_second": {
+              "successful": {"mean": 53.3, "median": 24.0, "count": 6},
+              "incomplete": {"mean": 22.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 48.9, "count": 9}
+            },
+            "total_per_second": {
+              "successful": {"mean": 298.45, "count": 6},
+              "incomplete": {"mean": 50.0, "count": 2},
+              "errored": {"mean": 0.0, "count": 1},
+              "total": {"mean": 279.8, "count": 9}
+            }
+          },
+          "token_distributions": {}
+        }
+      },
+      "requests": {
+        "successful": [
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-clean-1",
+            "response_id": "resp-1",
+            "request_args": null,
+            "output": "Answer one, in prose, after thinking.",
+            "reasoning_output": "A block of reasoning tokens.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-clean-1", "error": null},
+            "input_metrics": {"text_tokens": 1001},
+            "output_metrics": {"text_tokens": 900},
+            "prompt_tokens": 1001,
+            "output_tokens": 900,
+            "total_tokens": 1901,
+            "request_latency": 26.0,
+            "time_to_first_token_ms": 198.0,
+            "time_to_first_output_token_ms": 18742.0,
+            "time_per_output_token_ms": 1.18,
+            "inter_token_latency_ms": 1.1,
+            "output_tokens_per_second": 34.6
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-clean-2",
+            "response_id": "resp-2",
+            "request_args": null,
+            "output": "Answer two.",
+            "reasoning_output": "More reasoning tokens.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-clean-2", "error": null},
+            "input_metrics": {"text_tokens": 1000},
+            "output_metrics": {"text_tokens": 900},
+            "prompt_tokens": 1000,
+            "output_tokens": 900,
+            "total_tokens": 1900,
+            "request_latency": 25.4,
+            "time_to_first_token_ms": 175.0,
+            "time_to_first_output_token_ms": 18690.0,
+            "time_per_output_token_ms": 1.15,
+            "inter_token_latency_ms": 1.05,
+            "output_tokens_per_second": 35.4
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-clean-3",
+            "response_id": "resp-3",
+            "request_args": null,
+            "output": "Answer three.",
+            "reasoning_output": "Even more reasoning tokens.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-clean-3", "error": null},
+            "input_metrics": {"text_tokens": 1003},
+            "output_metrics": {"text_tokens": 900},
+            "prompt_tokens": 1003,
+            "output_tokens": 900,
+            "total_tokens": 1903,
+            "request_latency": 27.1,
+            "time_to_first_token_ms": 210.0,
+            "time_to_first_output_token_ms": 18800.0,
+            "time_per_output_token_ms": 1.2,
+            "inter_token_latency_ms": 1.12,
+            "output_tokens_per_second": 33.2
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-clean-4",
+            "response_id": "resp-4",
+            "request_args": null,
+            "output": "Answer four.",
+            "reasoning_output": "Reasoning for request four.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-clean-4", "error": null},
+            "input_metrics": {"text_tokens": 1004},
+            "output_metrics": {"text_tokens": 900},
+            "prompt_tokens": 1004,
+            "output_tokens": 900,
+            "total_tokens": 1904,
+            "request_latency": 26.8,
+            "time_to_first_token_ms": 205.0,
+            "time_to_first_output_token_ms": 18755.0,
+            "time_per_output_token_ms": 1.19,
+            "inter_token_latency_ms": 1.09,
+            "output_tokens_per_second": 33.6
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-length-truncated",
+            "response_id": "resp-5",
+            "request_args": null,
+            "output": "A partial answer cut off when generation reached the configured cap.",
+            "reasoning_output": "A very long reasoning block that consumed most of the budget.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-length-truncated", "error": null},
+            "input_metrics": {"text_tokens": 1002},
+            "output_metrics": {"text_tokens": 8192},
+            "prompt_tokens": 1002,
+            "output_tokens": 8192,
+            "total_tokens": 9194,
+            "request_latency": 55.1,
+            "time_to_first_token_ms": 240.0,
+            "time_to_first_output_token_ms": 41290.0,
+            "time_per_output_token_ms": 1.35,
+            "inter_token_latency_ms": 1.3,
+            "output_tokens_per_second": 148.7
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-empty-at-cap",
+            "response_id": "resp-6",
+            "request_args": "{\"body\": {\"max_tokens\": 100, \"ignore_eos\": false}}",
+            "output": "",
+            "reasoning_output": "Spent the entire per-request budget on reasoning and produced no answer.",
+            "tool_calls": null,
+            "info": {"status": "completed", "request_id": "req-empty-at-cap", "error": null},
+            "input_metrics": {"text_tokens": 1005},
+            "output_metrics": {"text_tokens": 100},
+            "prompt_tokens": 1005,
+            "output_tokens": 100,
+            "total_tokens": 1105,
+            "request_latency": 3.0,
+            "time_to_first_token_ms": 221.0,
+            "time_to_first_output_token_ms": 980.0,
+            "time_per_output_token_ms": 1.9,
+            "inter_token_latency_ms": 1.6,
+            "output_tokens_per_second": 33.3
+          }
+        ],
+        "incomplete": [
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-cancelled-1",
+            "response_id": null,
+            "request_args": null,
+            "output": "",
+            "reasoning_output": "Cancelled at the measurement boundary mid-reasoning.",
+            "tool_calls": null,
+            "info": {"status": "cancelled", "request_id": "req-cancelled-1", "error": null},
+            "input_metrics": {"text_tokens": 1001},
+            "output_metrics": {"text_tokens": 500},
+            "prompt_tokens": 1001,
+            "output_tokens": 500,
+            "total_tokens": 1501,
+            "request_latency": 2.2,
+            "time_to_first_token_ms": 185.0,
+            "time_to_first_output_token_ms": 18400.0,
+            "output_tokens_per_second": 250.0
+          },
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-cancelled-2",
+            "response_id": null,
+            "request_args": null,
+            "output": "",
+            "reasoning_output": "Also cancelled at the boundary.",
+            "tool_calls": null,
+            "info": {"status": "cancelled", "request_id": "req-cancelled-2", "error": null},
+            "input_metrics": {"text_tokens": 999},
+            "output_metrics": {"text_tokens": 500},
+            "prompt_tokens": 999,
+            "output_tokens": 500,
+            "total_tokens": 1499,
+            "request_latency": 2.0,
+            "time_to_first_token_ms": 195.0,
+            "time_to_first_output_token_ms": 18450.0,
+            "output_tokens_per_second": 250.0
+          }
+        ],
+        "errored": [
+          {
+            "type_": "generative_request_stats",
+            "request_id": "req-errored-1",
+            "response_id": null,
+            "request_args": null,
+            "output": null,
+            "reasoning_output": null,
+            "tool_calls": null,
+            "info": {
+              "status": "errored",
+              "request_id": "req-errored-1",
+              "error": "connection reset by peer"
+            },
+            "input_metrics": {"text_tokens": 0},
+            "output_metrics": {"text_tokens": 0},
+            "prompt_tokens": 0,
+            "output_tokens": 0
+          }
+        ]
+      },
+      "warnings": ["Backend reported a deprecated response field; metrics are unaffected."]
+    }
+  ],
+  "conclusions": []
+}

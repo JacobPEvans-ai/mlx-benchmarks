@@ -21,3 +21,17 @@ to tokenizing saved response text. The p90 uses nearest rank;
 `tokens_per_correct` is total output tokens divided by the rounded estimate
 from score ratio times sample count. Missing values are `null` with a
 `<field>_unavailable_reason` tag.
+
+## Derived speed field calculation
+
+vLLM `start_times`, `ttfts`, and `itls` are seconds; start times are absolute
+monotonic values. For each request, token-chunk arrivals are `start_time +
+ttft + cumulative itls`. If the request has fewer chunks than output tokens,
+each chunk is assigned an equal fractional share of that request's output
+length, so the shares sum exactly to `output_lens`. Times are rebased to the
+earliest request start and bucketed into non-overlapping `[n, n + 1)` second
+windows. The first token's bucket through the last token's bucket are included;
+empty buckets between them count as zero. Buckets before the first token's
+bucket or after the last token's bucket are excluded. Non-detailed and other
+engine rows keep unavailable values null with a reason rather than treating
+missing timing arrays as zero.

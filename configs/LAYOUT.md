@@ -26,6 +26,9 @@ configs/
 ├── vllm/
 │   ├── benchmark_serving.toml # vllm throughput cross-check; no local install
 │   └── cross-card.toml       # declarative vllm bench serve matrix
+├── guidellm/
+│   └── thinking-on-sweep.toml # GuideLLM reasoning-on serving sweep (concurrency 1/2/4/8)
+│                              # -> --kind guidellm; runner: scripts/run-guidellm-sweep.sh
 ├── agentic/
 │   └── tool-calling.toml     # in-repo runner: harness/agentic/run.py
 ├── llama-cpp/

@@ -185,17 +185,9 @@ reason at `speed.<field>`.
 - `peak_output_tok_s_1s_p99`: nearest-rank p99 of one-second window token counts.
 - `potential_efficiency`: `output_throughput / potential_output_tok_s_p50`.
 
-vLLM `start_times`, `ttfts`, and `itls` are seconds; start times are absolute
-monotonic values. For each request, token-chunk arrivals are `start_time +
-ttft + cumulative itls`. If the request has fewer chunks than output tokens,
-each chunk is assigned an equal fractional share of that request's output
-length, so the shares sum exactly to `output_lens`. Times are rebased to the
-earliest request start and bucketed into non-overlapping `[n, n + 1)` second
-windows. The first token's bucket through the last token's bucket are included;
-empty buckets between them count as zero. Buckets before the first token's
-bucket or after the last token's bucket are excluded. Non-detailed and other
-engine rows keep unavailable values null with a reason rather than treating
-missing timing arrays as zero.
+vLLM `start_times`, `ttfts`, and `itls` feed the one-second-window fields; the
+timing-array derivation is in
+[evaluation result fields](evaluation-result-fields.md#derived-speed-field-calculation).
 
 Sweep metadata may include:
 
@@ -205,14 +197,21 @@ Sweep metadata may include:
 
 ### Headline throughput metric: `total_tokens_per_second`
 
-As of 2026-07-27, `total_tokens_per_second` — cumulative (prompt + completion)
-tokens divided by wall-clock duration — is the **primary** throughput number
-to report and compare, not `decode_tokens_per_second`: a decode-only rate hides
-prefill-engine improvements entirely. `decode_tokens_per_second` and
+`total_tokens_per_second` — cumulative (prompt + completion) tokens divided by
+wall-clock duration — is the **primary** throughput number to report and
+compare, not `decode_tokens_per_second`: a decode-only rate hides prefill
+engine improvements entirely. `decode_tokens_per_second` and
 `prompt_tokens_per_second` remain supporting detail for root-causing *why* the
-cumulative number moved. This is a description/policy change only — no schema
-fields were added, removed, or renamed, so older published rows remain fully
-valid and comparable.
+cumulative number moved
+([standards](benchmark-standards.md#16-headline-throughput-metric)).
+
+### GuideLLM reasoning-on serving rows
+
+GuideLLM (`--kind guidellm`) publishes under the existing `throughput` suite,
+reusing the `--kind vllm` metric vocabulary plus `ttfa_*` latency rows,
+per-request status counts, and `truncated_or_empty_answers`. Field
+definitions and judgement rules:
+[`guidellm-sweep.md`](guidellm-sweep.md#published-rows).
 
 ## Validation
 
