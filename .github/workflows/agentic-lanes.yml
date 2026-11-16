@@ -45,6 +45,12 @@ jobs:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
 
+      # The publisher runs from the project venv, as the other workflows install it.
+      - name: Install the publisher
+        run: |
+          uv venv --python 3.13
+          uv pip install -e .
+
       - name: Run and publish each lane
         env:
           LLM_ROUTER_BASE_URL: ${{ secrets.LLM_ROUTER_BASE_URL }}
@@ -109,7 +115,7 @@ jobs:
               --cells "$CELLS" \
               --repeats "$REPEATS" \
               --output "results/$safe.json"; then
-              if uv run mlx-bench-publish "results/$safe.json" --kind agentic --suite tool-calling; then
+              if .venv/bin/mlx-bench-publish "results/$safe.json" --kind agentic --suite tool-calling; then
                 published=1
               fi
             fi
