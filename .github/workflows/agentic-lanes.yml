@@ -1,0 +1,133 @@
+# Agentic Lanes — runs the agentic tool-calling suite (harness/agentic/run.py)
+# against the OpenAI-compatible router, one model after another, and publishes
+# each result to the benchmark dataset with mlx-bench-publish. A lane whose
+# run or publish fails is recorded and does not stop the remaining lanes; the
+# run ends failed if any lane failed.
+
+name: Agentic Lanes
+
+on:
+  schedule:
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+    inputs:
+      models:
+        description: Comma-separated model names; empty uses the repository variable
+        type: string
+        default: ""
+      cells:
+        description: Comma-separated agentic cell names to run
+        type: string
+        default: "conc4_think-on_ctx-large_stream"
+      repeats:
+        description: Requests per cell
+        type: string
+        default: "3"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agentic-lanes
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: self-hosted
+    timeout-minutes: 350
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: pyproject.toml
+
+      # The publisher runs from the project venv, as the other workflows install it.
+      - name: Install the publisher
+        run: |
+          uv venv --python 3.13
+          uv pip install -e .
+
+      - name: Run and publish each lane
+        env:
+          LLM_ROUTER_BASE_URL: ${{ secrets.LLM_ROUTER_BASE_URL }}
+          LLM_ROUTER_API_KEY: ${{ secrets.LLM_ROUTER_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN_WRITE_ALL }}
+          MODELS_INPUT: ${{ inputs.models }}
+          MODELS_DEFAULT: ${{ vars.AGENTIC_LANE_MODELS }}
+          CELLS: ${{ inputs.cells || 'conc4_think-on_ctx-large_stream' }}
+          REPEATS: ${{ inputs.repeats || '3' }}
+        run: |
+          set -euo pipefail
+
+          # Required secrets; the error names the variable only, never its value.
+          for required in LLM_ROUTER_BASE_URL LLM_ROUTER_API_KEY HF_TOKEN; do
+            if [[ -z "${!required:-}" ]]; then
+              echo "Missing required value for '$required'; refusing to run." >&2
+              exit 1
+            fi
+          done
+
+          # Model list: the dispatch input wins, else the repository variable.
+          MODELS="${MODELS_INPUT:-$MODELS_DEFAULT}"
+          if [[ -z "$MODELS" ]]; then
+            echo "No models to run: set the 'models' dispatch input or the AGENTIC_LANE_MODELS repository variable." >&2
+            exit 1
+          fi
+
+          models_re='^[A-Za-z0-9._/-]+(,[A-Za-z0-9._/-]+)*$'
+          cells_re='^[A-Za-z0-9_,-]+$'
+          repeats_re='^[0-9]+$'
+          if ! [[ "$MODELS" =~ $models_re ]]; then
+            echo "Model list is not comma-separated [A-Za-z0-9._/-] names." >&2
+            exit 1
+          fi
+          if ! [[ "$CELLS" =~ $cells_re ]]; then
+            echo "CELLS is not [A-Za-z0-9_,-]+." >&2
+            exit 1
+          fi
+          if ! [[ "$REPEATS" =~ $repeats_re ]]; then
+            echo "REPEATS is not a non-negative integer." >&2
+            exit 1
+          fi
+
+          # Log to the console and to the step summary (model names only).
+          record() {
+            printf '%s\n' "$*"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              printf '%s\n' "$*" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          }
+
+          mkdir -p results
+          failed=()
+          IFS=',' read -r -a lanes <<< "$MODELS"
+          for model in "${lanes[@]}"; do
+            safe="${model//[^A-Za-z0-9._-]/_}"
+            published=0
+            if uv run harness/agentic/run.py \
+              --base-url "$LLM_ROUTER_BASE_URL" \
+              --api-key-env LLM_ROUTER_API_KEY \
+              --model "$model" \
+              --cells "$CELLS" \
+              --repeats "$REPEATS" \
+              --output "results/$safe.json"; then
+              if .venv/bin/mlx-bench-publish "results/$safe.json" --kind agentic --suite tool-calling; then
+                published=1
+              fi
+            fi
+            if [[ "$published" -eq 1 ]]; then
+              record "- $model: published"
+            else
+              record "- $model: failed"
+              failed+=("$model")
+            fi
+          done
+
+          if [[ "${#failed[@]}" -gt 0 ]]; then
+            echo "Failed models: ${failed[*]}" >&2
+            exit 1
+          fi
