@@ -27,6 +27,7 @@ EXPECTED = {
     "strata/throughput",
     "llama-cpp/cross-card",
     "vllm/cross-card",
+    "vllm/agentic-throughput",
     "mlx/cross-card",
     "mlx/vlm-native",
     "mlx/vlm-native-mtp",
