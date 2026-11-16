@@ -44,6 +44,8 @@ target's inventory facts so the envelope describes the benchmark target.
 - `llama-cpp/cross-card` (`llama_cpp`): llama.cpp native diagnostics and serving
   throughput.
 - `vllm/cross-card` (`vllm`): `vllm bench serve` throughput at two output sizes.
+- `vllm/agentic-throughput` (`vllm`): shared-prefix agent load with the prefix cache on, plus a generation
+  ceiling and a cold-prompt ceiling; rows vary concurrency only.
 - `mlx/cross-card` (`mlx_lm`): `mlx_lm.benchmark` diagnostics and serving
   throughput through a 262144-token window.
 - `mlx/vlm-native` (`mlx_vlm_native`): Native mlx-vlm serving throughput with

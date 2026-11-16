@@ -25,7 +25,8 @@ configs/
 │   └── ifbench-openai.toml  # cloud-router IFBench run (EvalScope OpenAI API)
 ├── vllm/
 │   ├── benchmark_serving.toml # vllm throughput cross-check; no local install
-│   └── cross-card.toml       # declarative vllm bench serve matrix
+│   ├── cross-card.toml       # declarative vllm bench serve matrix
+│   └── agentic-throughput.toml # shared-prefix agent load, prefix cache on, plus two ceilings
 ├── guidellm/
 │   └── thinking-on-sweep.toml # GuideLLM reasoning-on serving sweep (concurrency 1/2/4/8)
 │                              # -> --kind guidellm; runner: scripts/run-guidellm-sweep.sh

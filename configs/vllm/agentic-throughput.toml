@@ -1,0 +1,203 @@
+# Agent-shaped serving recipe for a vLLM endpoint that runs with its production settings.
+#
+# vllm/cross-card measures random prompts. Agents send something else: families of
+# requests that share a long opening and differ in their tail, to a server whose prefix
+# cache is on. This recipe measures that, so its result is the most tokens per second
+# the machine produces under realistic, well-built load. It also measures the two
+# ceilings a utilization figure needs: generation (short prompt, long output) and
+# computed prompt (long unique prompt, tiny output).
+#
+# Reading a cell: generated tok/s is the output throughput; prompt tok/s is the total
+# token throughput minus the output throughput.
+#
+# The shared-prefix rows use the upstream prefix_repetition dataset. Four prefixes per
+# cell stand for four agent families. Four warm-up requests put every prefix in the
+# cache before the measured requests. A long shared prefix with a short new suffix is
+# the same engine work as a late turn of an append-only conversation, so these rows also
+# stand in for serial multi-turn chains, which `vllm bench serve` cannot drive.
+#
+# Prompt sizes are fixed per row, so the rows vary concurrency only. Pick the
+# concurrency values per row at dispatch: the deep row at 2 to 8, the generation row at
+# 16 and above, the others at 8 and above. Every cell must finish inside the consumer's
+# per-cell limit; the request counts below are sized for that.
+config_name = "vllm/agentic-throughput"
+engines = ["vllm"]
+concurrency_list = [1, 2, 4, 8, 16, 32, 64]
+context_list = [1024, 8192, 30720, 32768, 90112, 131072]
+power_cap_w = "inventory"
+
+[[run]]
+name = "shared-prefix-everyday-p6144-s2048-o256"
+executable = "vllm"
+argv = [
+  "bench", "serve",
+  "--backend", "openai-chat",
+  "--base-url", "{{ benchmark_endpoint_root }}",
+  "--endpoint", "/v1/chat/completions",
+  "--model", "{{ model_id }}",
+  "--dataset-name", "prefix_repetition",
+  "--prefix-repetition-prefix-len", "6144",
+  "--prefix-repetition-suffix-len", "2048",
+  "--prefix-repetition-num-prefixes", "4",
+  "--prefix-repetition-output-len", "{{ output_tokens }}",
+  "--ignore-eos",
+  "--num-prompts", "128",
+  "--num-warmups", "4",
+  "--request-rate", "inf",
+  "--max-concurrency", "{{ concurrency }}",
+  "--seed", "{{ repetition }}",
+  "--percentile-metrics", "ttft,tpot,itl",
+  "--metric-percentiles", "50,90",
+  "--save-result",
+  "--save-detailed",
+  "--result-dir", "{{ result_dir }}",
+  "--result-filename", "{{ result_filename }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 2
+artifact_id = "selected_model"
+run_on = "benchmark_target"
+capture_stdout = true
+converter = { executable = "mlx-bench-publish", kind = "vllm", suite = "throughput", run_on = "controller" }
+prompt_tokens = 8192
+output_tokens = 256
+
+[[run]]
+name = "shared-prefix-long-p24576-s6144-o512"
+executable = "vllm"
+argv = [
+  "bench", "serve",
+  "--backend", "openai-chat",
+  "--base-url", "{{ benchmark_endpoint_root }}",
+  "--endpoint", "/v1/chat/completions",
+  "--model", "{{ model_id }}",
+  "--dataset-name", "prefix_repetition",
+  "--prefix-repetition-prefix-len", "24576",
+  "--prefix-repetition-suffix-len", "6144",
+  "--prefix-repetition-num-prefixes", "4",
+  "--prefix-repetition-output-len", "{{ output_tokens }}",
+  "--ignore-eos",
+  "--num-prompts", "96",
+  "--num-warmups", "4",
+  "--request-rate", "inf",
+  "--max-concurrency", "{{ concurrency }}",
+  "--seed", "{{ repetition }}",
+  "--percentile-metrics", "ttft,tpot,itl",
+  "--metric-percentiles", "50,90",
+  "--save-result",
+  "--save-detailed",
+  "--result-dir", "{{ result_dir }}",
+  "--result-filename", "{{ result_filename }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 2
+artifact_id = "selected_model"
+run_on = "benchmark_target"
+capture_stdout = true
+converter = { executable = "mlx-bench-publish", kind = "vllm", suite = "throughput", run_on = "controller" }
+prompt_tokens = 30720
+output_tokens = 512
+
+[[run]]
+name = "shared-prefix-deep-p73728-s16384-o512"
+executable = "vllm"
+argv = [
+  "bench", "serve",
+  "--backend", "openai-chat",
+  "--base-url", "{{ benchmark_endpoint_root }}",
+  "--endpoint", "/v1/chat/completions",
+  "--model", "{{ model_id }}",
+  "--dataset-name", "prefix_repetition",
+  "--prefix-repetition-prefix-len", "73728",
+  "--prefix-repetition-suffix-len", "16384",
+  "--prefix-repetition-num-prefixes", "4",
+  "--prefix-repetition-output-len", "{{ output_tokens }}",
+  "--ignore-eos",
+  "--num-prompts", "32",
+  "--num-warmups", "4",
+  "--request-rate", "inf",
+  "--max-concurrency", "{{ concurrency }}",
+  "--seed", "{{ repetition }}",
+  "--percentile-metrics", "ttft,tpot,itl",
+  "--metric-percentiles", "50,90",
+  "--save-result",
+  "--save-detailed",
+  "--result-dir", "{{ result_dir }}",
+  "--result-filename", "{{ result_filename }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 2
+artifact_id = "selected_model"
+run_on = "benchmark_target"
+capture_stdout = true
+converter = { executable = "mlx-bench-publish", kind = "vllm", suite = "throughput", run_on = "controller" }
+prompt_tokens = 90112
+output_tokens = 512
+
+[[run]]
+name = "generation-ceiling-p1024-o2048"
+executable = "vllm"
+argv = [
+  "bench", "serve",
+  "--backend", "openai-chat",
+  "--base-url", "{{ benchmark_endpoint_root }}",
+  "--endpoint", "/v1/chat/completions",
+  "--model", "{{ model_id }}",
+  "--dataset-name", "random",
+  "--random-input-len", "1024",
+  "--random-output-len", "{{ output_tokens }}",
+  "--random-prefix-len", "0",
+  "--ignore-eos",
+  "--num-prompts", "64",
+  "--request-rate", "inf",
+  "--max-concurrency", "{{ concurrency }}",
+  "--seed", "{{ repetition }}",
+  "--percentile-metrics", "ttft,tpot,itl",
+  "--metric-percentiles", "50,90",
+  "--save-result",
+  "--save-detailed",
+  "--result-dir", "{{ result_dir }}",
+  "--result-filename", "{{ result_filename }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 2
+artifact_id = "selected_model"
+run_on = "benchmark_target"
+capture_stdout = true
+converter = { executable = "mlx-bench-publish", kind = "vllm", suite = "throughput", run_on = "controller" }
+prompt_tokens = 1024
+output_tokens = 2048
+
+[[run]]
+name = "cold-prompt-ceiling-p32768-o16"
+executable = "vllm"
+argv = [
+  "bench", "serve",
+  "--backend", "openai-chat",
+  "--base-url", "{{ benchmark_endpoint_root }}",
+  "--endpoint", "/v1/chat/completions",
+  "--model", "{{ model_id }}",
+  "--dataset-name", "random",
+  "--random-input-len", "32768",
+  "--random-output-len", "{{ output_tokens }}",
+  "--random-prefix-len", "0",
+  "--ignore-eos",
+  "--num-prompts", "32",
+  "--request-rate", "inf",
+  "--max-concurrency", "{{ concurrency }}",
+  "--seed", "{{ repetition }}",
+  "--percentile-metrics", "ttft,tpot,itl",
+  "--metric-percentiles", "50,90",
+  "--save-result",
+  "--save-detailed",
+  "--result-dir", "{{ result_dir }}",
+  "--result-filename", "{{ result_filename }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 2
+artifact_id = "selected_model"
+run_on = "benchmark_target"
+capture_stdout = true
+converter = { executable = "mlx-bench-publish", kind = "vllm", suite = "throughput", run_on = "controller" }
+prompt_tokens = 32768
+output_tokens = 16
