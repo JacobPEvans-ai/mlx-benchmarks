@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.74.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.73.0...v0.74.0) (2026-11-16)
+
+
+### Features
+
+* **configs:** add an agent-shaped vLLM campaign recipe with the prefix cache on ([#532](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/532)) ([b5aacf9](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/b5aacf9136d4936d9dd9fa0574d4e11ff9150cc2))
+
 ## [0.73.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.72.0...v0.73.0) (2026-11-14)
 
 
