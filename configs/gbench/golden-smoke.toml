@@ -1,0 +1,27 @@
+# Deterministic Golden Set smoke check via gbench against an OpenAI-compatible
+# endpoint. Requires no Gemini judge key.
+config_name = "gbench/golden-smoke"
+engines = ["llama_cpp", "vllm", "mlx_lm", "vllm_mlx"]
+concurrency_list = [1, 2, 4, 8]
+context_list = [32768]
+power_cap_w = "inventory"
+
+[[run]]
+name = "gbench-golden"
+executable = "gbench"
+argv = [
+  "--remote-endpoint", "{{ benchmark_endpoint }}",
+  "--models", "{{ model_id }}",
+  "--served-model-id", "{{ serving_model }}",
+  "--tokenizer", "{{ model_id }}",
+  "--golden-only",
+  "--results-dir", "{{ output_path }}",
+]
+dimensions = []
+repetitions = 1
+artifact_id = "selected_model"
+run_on = "controller"
+capture_stdout = false
+converter = { executable = "mlx-bench-publish", kind = "gbench", suite = "reasoning", run_on = "controller" }
+output_tokens = 2048
+api_key_env = "OPENAI_API_KEY"

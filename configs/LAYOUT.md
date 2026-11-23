@@ -23,6 +23,10 @@ configs/
 │   ├── aa-lcr.toml    # AA-LCR
 │   ├── livecodebench.toml    # registry-selected LiveCodeBench v6 pass (EvalScope)
 │   └── ifbench-openai.toml  # cloud-router IFBench run (EvalScope OpenAI API)
+├── gbench/
+│   ├── golden-smoke.toml     # gbench deterministic Golden Set -> --kind gbench
+│   ├── stress-agentic.toml   # gbench open-loop agentic SLO stress -> --kind gbench
+│   └── capability-unsat.toml # gbench deterministic/exec capability suites -> --kind gbench
 ├── vllm/
 │   ├── benchmark_serving.toml # vllm throughput cross-check; no local install
 │   ├── cross-card.toml       # declarative vllm bench serve matrix

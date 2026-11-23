@@ -39,16 +39,20 @@ EXPECTED = {
     "lm-eval/reasoning",
     "evalscope/livecodebench",
     "evalscope/mmlu-pro-reasoning-effort",
+    "gbench/golden-smoke",
+    "gbench/stress-agentic",
+    "gbench/capability-unsat",
 }
 LONG_CONTEXT_RECIPES = EXPECTED - {
     "lm-eval/coding",
     "lm-eval/reasoning",
     "evalscope/mmlu-pro-reasoning-effort",
+    "gbench/golden-smoke",
 }
 ENGINES = {"llama_cpp", "vllm", "mlx_lm", "mlx_vlm_native", "vllm_mlx", "strata"}
 AGENT_COUNTS = {1, 2, 4, 8}
 LONG_CONTEXT_TOKENS = 131072
-CONFIG_NAME = re.compile(r"^(llama-cpp|strata|vllm|mlx|lm-eval|evalscope)/[a-z0-9-]+$")
+CONFIG_NAME = re.compile(r"^(llama-cpp|strata|vllm|mlx|lm-eval|evalscope|gbench)/[a-z0-9-]+$")
 # The only tokens the consumer's argv template substitutes.
 PLACEHOLDERS = {
     "artifact_path",
@@ -336,3 +340,22 @@ def test_vllm_mlx_recipe_declares_its_continuous_batching_engine() -> None:
     recipe = RECIPES["mlx/vllm-mlx"]
     assert recipe["engines"] == ["vllm_mlx"]
     assert 262016 in recipe["context_list"]
+
+
+def test_gbench_recipes_use_remote_endpoint_without_gemini_judge() -> None:
+    for name in ("gbench/golden-smoke", "gbench/stress-agentic", "gbench/capability-unsat"):
+        (run,) = RECIPES[name]["run"]
+        assert run["executable"] == "gbench"
+        assert run["run_on"] == "controller"
+        assert run["converter"]["kind"] == "gbench"
+        assert _argument_after(run, "--remote-endpoint") == "{{ benchmark_endpoint }}"
+        assert _argument_after(run, "--models") == "{{ model_id }}"
+        assert _argument_after(run, "--served-model-id") == "{{ serving_model }}"
+        assert _argument_after(run, "--results-dir") == "{{ output_path }}"
+
+    assert "--golden-only" in RECIPES["gbench/golden-smoke"]["run"][0]["argv"]
+    assert "--stress-test" in RECIPES["gbench/stress-agentic"]["run"][0]["argv"]
+    assert _argument_after(RECIPES["gbench/stress-agentic"]["run"][0], "--campaign") == "agentic"
+    cap_run = RECIPES["gbench/capability-unsat"]["run"][0]
+    assert "--evals-only" in cap_run["argv"]
+    assert cap_run["dimensions"] == ["concurrency_list"]
