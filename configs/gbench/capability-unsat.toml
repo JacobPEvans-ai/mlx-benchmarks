@@ -1,0 +1,30 @@
+# Deterministic and execution-scored capability suites via gbench without a
+# Gemini judge key: IFEval, LiveCodeBench, BigCodeBench, BFCL, and AIME.
+config_name = "gbench/capability-unsat"
+engines = ["llama_cpp", "vllm", "mlx_lm", "vllm_mlx"]
+concurrency_list = [1, 2, 4, 8]
+context_list = [32768, 65536, 131072]
+power_cap_w = "inventory"
+
+[[run]]
+name = "gbench-capability-unsat"
+executable = "gbench"
+argv = [
+  "--remote-endpoint", "{{ benchmark_endpoint }}",
+  "--models", "{{ model_id }}",
+  "--served-model-id", "{{ serving_model }}",
+  "--tokenizer", "{{ model_id }}",
+  "--evals-only",
+  "--evals", "ifeval", "lcb", "bigcodebench", "bfcl", "aime",
+  "--eval-concurrency", "{{ concurrency }}",
+  "--max-output-tokens", "{{ output_tokens }}",
+  "--results-dir", "{{ output_path }}",
+]
+dimensions = ["concurrency_list"]
+repetitions = 1
+artifact_id = "selected_model"
+run_on = "controller"
+capture_stdout = false
+converter = { executable = "mlx-bench-publish", kind = "gbench", suite = "reasoning", run_on = "controller" }
+output_tokens = 16384
+api_key_env = "OPENAI_API_KEY"

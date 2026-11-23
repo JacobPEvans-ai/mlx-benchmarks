@@ -66,6 +66,13 @@ target's inventory facts so the envelope describes the benchmark target.
   EvalScope's Docker sandbox.
 - `evalscope/mmlu-pro-reasoning-effort` (`llama_cpp`): seeded MMLU-Pro generative
   samples with OFF, LOW, and XHIGH reasoning arms at concurrency one.
+- `gbench/golden-smoke` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): deterministic
+  `gbench --golden-only` smoke check over OpenAI-compatible chat endpoints.
+- `gbench/stress-agentic` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): open-loop
+  `gbench --stress-test --campaign agentic` capacity-under-SLO sweep.
+- `gbench/capability-unsat` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): deterministic
+  and execution-scored `gbench --evals-only` capability suites (`ifeval`, `lcb`,
+  `bigcodebench`, `bfcl`, `aime`).
 
 Recipes declare concurrency and context axes in TOML. Most recipes use concurrency
 values 1, 2, 4, and 8; Strata also tests 6. MLX serving recipes include a
