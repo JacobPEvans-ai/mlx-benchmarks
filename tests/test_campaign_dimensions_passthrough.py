@@ -79,6 +79,11 @@ def _moe_offload() -> dict[str, str]:
         return next(csv.DictReader(source))
 
 
+def _gbench() -> dict[str, Any]:
+    path = Path(__file__).parent / "fixtures" / "gbench_summary_sample.json"
+    return json.loads(path.read_text())
+
+
 # kind -> (suite, builder of the raw tool output). Builders take the shared fixtures.
 RAW_BY_KIND: dict[str, tuple[str, Callable[[pytest.FixtureRequest], Any]]] = {
     "agentic": ("tool-calling", lambda r: r.getfixturevalue("agentic_sample")),
@@ -95,6 +100,7 @@ RAW_BY_KIND: dict[str, tuple[str, Callable[[pytest.FixtureRequest], Any]]] = {
     "evalscope": ("coding", lambda r: r.getfixturevalue("evalscope_sample")),
     "factual": ("grounded-summary", lambda r: r.getfixturevalue("factual_sample")),
     "fio": ("fio", lambda r: r.getfixturevalue("fio_sample")),
+    "gbench": ("reasoning", lambda _: _gbench()),
     "gpu-burn": ("gpu-burn", lambda r: r.getfixturevalue("gpu_burn_sample")),
     "guidellm": ("throughput", lambda r: r.getfixturevalue("guidellm_report")),
     "inspect-ai": (

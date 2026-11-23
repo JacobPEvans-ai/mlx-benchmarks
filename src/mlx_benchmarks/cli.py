@@ -66,6 +66,7 @@ def build_parser() -> argparse.ArgumentParser:
             "evalscope",
             "factual",
             "fio",
+            "gbench",
             "guidellm",
             "gpu-burn",
             "inspect-ai",
@@ -667,11 +668,20 @@ def _extract_model(raw: dict[str, Any] | list[Any]) -> str:
     for candidate in (
         raw.get("model_name"),
         model_args.get("model"),
+        raw.get("served_model_id"),
         raw.get("model"),
         eval_header.get("model") if isinstance(eval_header, dict) else None,
     ):
         if isinstance(candidate, str) and candidate:
             return candidate
+    models = raw.get("models")
+    if isinstance(models, list):
+        for entry in models:
+            if isinstance(entry, dict):
+                for key in ("served_model_id", "model", "model_short"):
+                    val = entry.get(key)
+                    if isinstance(val, str) and val:
+                        return val
     return "unknown"
 
 

@@ -9,6 +9,7 @@ from mlx_benchmarks.converters.dense_layout import DenseLayoutConverter
 from mlx_benchmarks.converters.evalscope import EvalScopeConverter
 from mlx_benchmarks.converters.factual import FactualConverter
 from mlx_benchmarks.converters.fio import FioConverter
+from mlx_benchmarks.converters.gbench import GbenchConverter
 from mlx_benchmarks.converters.gpu_burn import GpuBurnConverter
 from mlx_benchmarks.converters.guidellm import GuidellmConverter
 from mlx_benchmarks.converters.inspect_ai import InspectAIConverter
@@ -34,6 +35,7 @@ __all__ = [
     "EvalScopeConverter",
     "FactualConverter",
     "FioConverter",
+    "GbenchConverter",
     "GpuBurnConverter",
     "GuidellmConverter",
     "InspectAIConverter",
@@ -67,6 +69,7 @@ def get_converter(kind: str) -> Converter:
         "evalscope": EvalScopeConverter,
         "factual": FactualConverter,
         "fio": FioConverter,
+        "gbench": GbenchConverter,
         "guidellm": GuidellmConverter,
         "gpu-burn": GpuBurnConverter,
         "inspect-ai": InspectAIConverter,
