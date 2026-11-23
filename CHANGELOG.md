@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.76.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.75.0...v0.76.0) (2026-11-23)
+
+
+### Features
+
+* **recipes:** add gbench campaign recipes ([#538](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/538)) ([28dbd11](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/28dbd11c1eb2d29fd3270873b66df416586f822c))
+
 ## [0.75.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.74.0...v0.75.0) (2026-11-23)
 
 
