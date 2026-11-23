@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.75.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.74.0...v0.75.0) (2026-11-23)
+
+
+### Features
+
+* **converters:** add gbench result converter ([#536](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/536)) ([fa3d699](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/fa3d69938d6b37e67df7474e906f9b1a68f58df5))
+
 ## [0.74.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.73.0...v0.74.0) (2026-11-16)
 
 
