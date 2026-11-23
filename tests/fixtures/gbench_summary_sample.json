@@ -1,0 +1,88 @@
+{
+  "timestamp": "11-23-140500",
+  "results_dir": "/var/lib/gbench/results/run-11-23-140500",
+  "total_configurations": 5,
+  "successful_configurations": 4,
+  "failed_configurations": 1,
+  "models": [
+    {
+      "benchmark_type": "golden",
+      "model_short": "qwen3.5-35b",
+      "served_model_id": "unsloth/Qwen3.5-35B-A3B-GGUF",
+      "format": "remote",
+      "status": "passed",
+      "passed_cases": 11,
+      "applicable_tasks": 12,
+      "total_tasks": 12,
+      "failed_cases": 1,
+      "error_cases": 0,
+      "not_applicable_cases": 0,
+      "accuracy_percent": 91.67,
+      "duration_seconds": 18.4,
+      "task_results": [
+        {"task_id": "tool_call_basic", "category": "tool_calling", "status": "passed"},
+        {"task_id": "json_schema_strict", "category": "structured_output", "status": "passed"},
+        {"task_id": "multi_turn_state", "category": "tool_calling", "status": "failed"}
+      ]
+    },
+    {
+      "benchmark_type": "eval",
+      "eval_name": "ifeval",
+      "eval_preset": "deterministic",
+      "model_short": "qwen3.5-35b",
+      "served_model_id": "unsloth/Qwen3.5-35B-A3B-GGUF",
+      "format": "remote",
+      "thinking": true,
+      "total_questions": 541,
+      "effective_n": 541,
+      "correct": 465,
+      "accuracy": 85.95,
+      "replies_cut_off_by_budget": 4,
+      "duration_seconds": 142.0,
+      "category_accuracy": {
+        "prompt_strict": {"correct": 465, "total": 541, "accuracy": 85.95},
+        "instruction_strict": {"correct": 710, "total": 834, "accuracy": 85.13}
+      },
+      "sample_traces_omitted": {"count": 541, "file": "eval_ifeval_qwen3.5-35b_remote.json"}
+    },
+    {
+      "benchmark_type": "serving",
+      "model_short": "qwen3.5-35b",
+      "served_model_id": "unsloth/Qwen3.5-35B-A3B-GGUF",
+      "campaign": "agentic-1",
+      "output_tokens_per_second_mean": 72.4,
+      "request_throughput_mean": 0.42,
+      "ttft_p50_ms": 115.2,
+      "ttft_p99_ms": 210.8,
+      "tpot_p50_ms": 13.8,
+      "itl_p50_ms": 13.9,
+      "itl_p99_ms": 22.1,
+      "duration_seconds": 61.5
+    },
+    {
+      "benchmark_type": "stress_test",
+      "model": "qwen3.5-35b",
+      "served_model_id": "unsloth/Qwen3.5-35B-A3B-GGUF",
+      "format": "remote",
+      "campaign": "agentic-1",
+      "multimodal": false,
+      "max_sustainable_qps": 3.5,
+      "max_sustainable_qps_certified": true,
+      "little_law_n_users": 12.0,
+      "mean_e2e_ms": 3420.0,
+      "preflight_single_stream_ttft_ms": 98.5,
+      "preflight_single_stream_per_token_ms": 14.1,
+      "ttft_threshold_ms": 5000,
+      "itl_threshold_ms": 200
+    }
+  ],
+  "failures": [
+    {
+      "benchmark_type": "eval",
+      "eval_name": "bfcl",
+      "model_short": "qwen3.5-35b",
+      "status": "failed",
+      "error": "endpoint returned HTTP 503 during warmup"
+    }
+  ]
+}
