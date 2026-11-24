@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.77.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.76.0...v0.77.0) (2026-11-24)
+
+
+### Features
+
+* **index:** register live gbench golden and stress-agentic E2E runs ([#540](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/540)) ([6f91e9f](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/6f91e9f1b49bf700d05de5ecb0d48b3d6e99ebab))
+
 ## [0.76.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.75.0...v0.76.0) (2026-11-23)
 
 
