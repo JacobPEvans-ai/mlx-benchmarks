@@ -15,8 +15,7 @@ configs/
 │   ├── ruler.toml            # registry-selected long-context RULER campaign
 │   ├── math-hard.toml        # minerva_math500
 │   ├── quick-intelligence.toml # registry-selected leaderboard_mmlu_pro quick pass
-│   ├── gpqa-diamond.toml     # registry-selected gpqa_diamond_cot_zeroshot pass
-│   └── qwen3-tasks/          # optional <think>-stripping overlay (see below)
+│   └── gpqa-diamond.toml     # registry-selected gpqa_diamond_cot_zeroshot pass
 ├── evalscope/
 │   ├── hle.toml       # HLE
 │   ├── scicode.toml   # SciCode
@@ -37,14 +36,16 @@ configs/
 ├── agentic/
 │   └── tool-calling.toml     # in-repo runner: harness/agentic/run.py
 ├── llama-cpp/
-│   ├── throughput.toml       # registry-selected OpenAI-compatible serving campaign
+│   ├── throughput.toml       # registry-selected gbench serving campaign
 │   ├── vllm-fixed-length.toml # fixed-output vLLM chat client cells for llama.cpp
-│   ├── manual-throughput.toml # historical serving runbook; draft-model A/B sweep
-│   └── cross-card.toml       # llama-bench/batched-bench diagnostics + probe envelope
+│   └── cross-card.toml       # llama-bench/batched-bench diagnostics + gbench envelope
 ├── strata/
-│   └── throughput.toml       # registry-selected OpenAI-compatible throughput
+│   └── throughput.toml       # registry-selected gbench serving throughput
 ├── mlx/
-│   └── cross-card.toml       # mlx_lm.benchmark diagnostics + throughput-probe envelope
+│   ├── cross-card.toml       # mlx_lm.benchmark diagnostics + gbench envelope
+│   ├── vlm-native.toml       # native mlx-vlm gbench serving envelope (MTP off)
+│   ├── vlm-native-mtp.toml   # native mlx-vlm gbench serving envelope (MTP on)
+│   └── vllm-mlx.toml         # vllm-mlx gbench serving envelope
 ├── nvidia/                   # NVIDIA/CUDA campaign; see "NVIDIA hosts" below
 │   ├── throughput.toml       # closed/open-loop serving runs; see
 │   │                         # docs/nvidia-campaign.md
@@ -53,10 +54,6 @@ configs/
 │   ├── nvbandwidth.toml      # GPU copy bandwidth baseline -> --kind nvbandwidth
 │   ├── mbw.toml              # host RAM bandwidth baseline -> --kind mbw
 │   └── fio.toml              # storage baseline -> --kind fio
-├── promptstack/
-│   ├── promptstack.toml      # in-repo runner: harness/promptstack/run.py
-│   ├── probes/               # frozen probe banks, one JSON per probe class
-│   └── prompts/              # composed system prompts under test
 ├── s1-routing/
 │   └── s1-routing.toml       # in-repo runner: harness/s1-routing/run.py
 ├── factual/
@@ -71,10 +68,9 @@ configs/
                               # fit budget, and why each rejection was rejected
 ```
 
-Three files here break the "(tool, suite) runbook" rule, deliberately:
-`promptstack/probes/`, `factual/fixtures/`, and `coding-replay/tasks.json` are
-**data read by their runners at run time**, not documentation — freezing them
-beside their config is what makes a score reproducible across runs. Each
+Two files here break the "(tool, suite) runbook" rule, deliberately:
+`factual/fixtures/` and `coding-replay/tasks.json` are
+**data read by their runners at run time**, not documentation — freezing them beside their config is what makes a score reproducible across runs. Each
 `coding-replay` task pins a real merged PR (repo, PR number, base commit,
 title/body, changed files, and a named repo check) so a replay always starts
 from the same base and scores against the same file set; the repo-to-local-
@@ -117,8 +113,9 @@ its inventory, endpoint, cache, and power contract is documented in
 [`docs/benchmark-campaign-target-inputs.md`](../docs/benchmark-campaign-target-inputs.md).
 
 The repo owns conversion after a supported run: `vllm bench serve` output uses
-the existing `--kind vllm` converter; the OpenAI-compatible
-`harness/throughput/run.py` output uses `--kind throughput-probe`; lm-eval
+the existing `--kind vllm` converter; `gbench` `summary.json` output uses
+`--kind gbench` (retaining `--kind throughput-probe` and `--kind promptstack`
+for historical shards only); lm-eval
 JSON uses `--kind lm-eval`; and the `results.json` from `tau2 run` uses `--kind tau2`
 ([tau2 guide](../docs/tau2.md)). `llama-bench -o json` and
 `mlx_lm.benchmark` produce raw stdout diagnostics only; no existing converter
@@ -132,18 +129,6 @@ depth + 8192 prompt + 128 output); otherwise it marks the row N/A or rejects
 it without dispatch. The batched diagnostic is limited to SMALL/MEDIUM models
 by the external consumer. See the top-level
 [README](../README.md) → "Run + publish a benchmark".
-
-## qwen3-tasks overlay (local coding runs)
-
-`configs/lm-eval/qwen3-tasks/` provides `humaneval`/`mbpp` variants whose
-custom filter strips `<think>…</think>` content AND extracts the fenced
-Python code block from a chat-style answer. This overlay is the **default**
-for the local `mlx-eval` coding suite, not an optional extra: chat-served
-Instruct models answer in prose + markdown, and the plain `humaneval`/`mbpp`
-extractors grab only the echoed prompt — measured 2026-07-08, a 30B Instruct
-model scored humaneval pass@1 = 0.0 / mbpp 0.128 under the plain tasks purely
-as an extraction artifact. Reserve the plain tasks for completion-style
-(non-chat) endpoints that emit bare code.
 
 ## TOML shape
 

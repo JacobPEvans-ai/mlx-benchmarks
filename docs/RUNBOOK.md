@@ -74,7 +74,7 @@ See the [complete benchmark block procedure](benchmark-block-runbook.md).
 **One actor at a time.** Never edit the `llama-swap` config, restart serving, or
 start a second `vllm-mlx serve` while a bench is in flight — the second loader
 contends for GPU memory and both runs corrupt or OOM. Check for a live
-`mlx-eval`/`mlx-bench`/`vllm-mlx`/`run.py` and a bench-chain log heartbeat
+`mlx-eval`/`mlx-bench`/`vllm-mlx`/`gbench`
 ([trap 10](benchmark-traps.md#trap-10-run-hygiene)) first.
 
 ## Step 1 — Identify and size the model
@@ -153,18 +153,13 @@ budget ~**4×**; discard + re-run a diverging pair.
   publish flags, and published-row semantics are in
   [`guidellm-sweep.md`](guidellm-sweep.md).
 
-### 4b. Coding (`--kind lm-eval --suite coding`) — ~3 h
+### 4b. Coding (`--kind lm-eval|gbench --suite coding`) — ~3 h
 
-Plain `humaneval`/`mbpp` score ~0 on chat-served models. **Always use the
-overlay** ([trap 1](benchmark-traps.md#trap-1-coding-overlay-is-mandatory)):
-
-```sh
-HF_ALLOW_CODE_EVAL=1 MLX_EVAL_CONCURRENT=4 mlx-eval \
-  --include_path configs/lm-eval/qwen3-tasks \
-  --tasks humaneval_instruct_qwen3,mbpp_instruct_qwen3 \
-  --confirm_run_unsafe_code --log_samples \
-  --output_path ./run-output/<slug>
-```
+Preferred: use `gbench --evals-only --evals lcb bigcodebench` (see
+[`../configs/gbench/capability-unsat.toml`](../configs/gbench/capability-unsat.toml)).
+Plain `lm-eval` `humaneval`/`mbpp` scores ~0 on chat-served models because the
+upstream extractor grabs echoed prompt text
+([trap 1](benchmark-traps.md#trap-1-plain-coding-extractors-misfire-on-chat-output)).
 
 Coding benchmarks **execute model-generated code** — read
 [`../SECURITY.md`](../SECURITY.md) before running outside a sandbox.
