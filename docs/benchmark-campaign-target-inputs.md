@@ -26,9 +26,7 @@ when present and omits the envelope field when the target has no cap.
 Before dispatch, the consumer checks each prompt-plus-output reservation
 against the authoritative artifact and engine context limit, and each
 concurrency against the selected serving profile cap. It fails closed if a
-limit is unavailable or exceeded. For throughput-probe rows, it resolves
-`context_window_tokens` from the selected model registry record and passes it
-as `--window-limit-tokens`; an absent registry value fails before dispatch.
+limit is unavailable or exceeded.
 When conversion runs on the controller, it sets `MLX_BENCH_SYSTEM_OS`,
 `MLX_BENCH_SYSTEM_CHIP`, and `MLX_BENCH_SYSTEM_MEMORY_GB` from the selected
 target's inventory facts so the envelope describes the benchmark target.

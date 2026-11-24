@@ -74,11 +74,11 @@ and [GuideLLM](https://github.com/vllm-project/guidellm) (the reasoning-on
 serving sweep) — none installed by this repo: lm-eval and benchmark_serving
 are invoked through thin `uvx` wrappers in the serving stack (nix-ai
 `mlx-eval` / `mlx-bench`), GuideLLM through
-`scripts/run-guidellm-sweep.sh`. The `tool-calling`, `promptstack`, and
-`grounded-summary` suites are the exceptions: standalone PEP 723 runners under
-`harness/`, documented in [`docs/agentic.md`](docs/agentic.md),
-[`docs/promptstack.md`](docs/promptstack.md), and
-[`docs/shootout.md`](docs/shootout.md).
+`scripts/run-guidellm-sweep.sh`. The `tool-calling` and `grounded-summary`
+suites are standalone PEP 723 runners under `harness/`, documented in
+[`docs/agentic.md`](docs/agentic.md) and [`docs/shootout.md`](docs/shootout.md)
+(`promptstack` is retired in favor of Promptfoo / `llm-prompt-evals`, see
+[`docs/promptstack.md`](docs/promptstack.md)).
 
 [`configs/LAYOUT.md`](configs/LAYOUT.md) is the single source of truth for which
 suites are wired to which tool.

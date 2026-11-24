@@ -6,7 +6,7 @@
 # already reads, so this runbook needs no new code. GenAI-Perf is deliberately not
 # wired: NVIDIA states it is being phased out, and no converter exists for its export.
 #
-# Same shape as configs/llama-cpp/manual-throughput.toml: this repo never starts a server.
+# This repo never starts a server.
 # Launch vLLM out-of-band, with prefix caching OFF and a window covering the longest
 # cell plus its output:
 #   vllm serve $MODEL --no-enable-prefix-caching --max-model-len $CONTEXT_LEN
@@ -81,22 +81,19 @@ vllm bench serve \
   --result-filename vllm_${MODEL_SLUG}_smoke.json
 """
 
-# Cross-check and the only source of prefill tok/s: the in-repo probe speaks plain
-# OpenAI-compatible /v1/chat/completions, so it runs unchanged against vLLM. It
-# calibrates the prompt to an exact server-reported token count, varies the prompt per
-# repeat, and sends its concurrent phase as one burst of $C requests. Add --dedicated
-# only if this arm was the sole consumer of the endpoint.
+# OpenAI-compatible cross-check via gbench serving mode.
 [run.probe]
 command = """
-uv run harness/throughput/run.py \
-  --base-url $VLLM_HOST/v1 \
-  --model $MODEL \
-  --target-prompt-tokens $P \
-  --window-limit-tokens $CONTEXT_LEN \
-  --max-tokens 512 \
-  --repeats 2 \
-  --concurrency $C \
-  --output run-output/probe_${MODEL_SLUG}_p${P}_c${C}.json
+gbench \
+  --remote-endpoint $VLLM_HOST/v1 \
+  --models $MODEL \
+  --tokenizer $MODEL \
+  --serving-only --text-only \
+  --batch-sizes $C \
+  --input-lengths $P \
+  --output-lengths 512 \
+  --num-iterations 2 \
+  --results-dir run-output/gbench_${MODEL_SLUG}_p${P}_c${C}
 """
 
 # One call per cell and per repeat. Dry-run first (add --dry-run). The three sweep tags
@@ -116,8 +113,8 @@ mlx-bench-publish run-output/vllm_${MODEL_SLUG}_p${P}_c${C}_r${REP}.json \
 
 [publish.probe]
 command = """
-mlx-bench-publish run-output/probe_${MODEL_SLUG}_p${P}_c${C}.json \
-  --kind throughput-probe --suite throughput --model $MODEL \
+mlx-bench-publish run-output/gbench_${MODEL_SLUG}_p${P}_c${C}/summary.json \
+  --kind gbench --suite throughput --model $MODEL \
   --env-class $ENV_CLASS --concurrency $C \
   --serving-stack vllm --serving-model $MODEL \
   --tag prompt_tokens=$P --tag concurrency=$C --tag context_len=$CONTEXT_LEN \

@@ -36,12 +36,12 @@ bare letter answer. A model that reasons in full prose ("The best answer is
 C") scores `exact_match=0` even when correct — measured: 15/15 zero while the
 model was actually right in 13-14 of 15 (verified by reading `filtered_resps`
 against `target`, not clipped — responses topped out at ~330 tokens against a
-4096 cap). Same shape as the coding suite's mandatory qwen3-tasks overlay
-([trap 1](benchmark-traps.md#trap-1-coding-overlay-is-mandatory)), but for
-reasoning: the extractor, not the model, is broken. Use a flexible-extract
-task (`gsm8k`) instead of `arc_challenge_chat` for models with this answer
-shape, and never report an `exact_match` number without reading samples
-first.
+4096 cap). Same shape as the coding extraction issue
+([trap 1](benchmark-traps.md#trap-1-plain-coding-extractors-misfire-on-chat-output)),
+but for reasoning: the extractor, not the model, is broken. Use a
+flexible-extract task (`gsm8k`) or `gbench` instead of `arc_challenge_chat`
+for models with this answer shape, and never report an `exact_match` number
+without reading samples first.
 
 ### Trap 16: a standalone-server quant comparison isn't a production number
 

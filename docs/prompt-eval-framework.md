@@ -106,5 +106,5 @@ uv run --extra inspect mlx-bench-publish run.eval --kind inspect-ai --suite reas
 3. **P3 — `ansible-proxmox-apps`**: homelab GitHub runner for
    `llm-prompt-evals` fabric jobs (security model above).
 4. **P4 — API apps**: wire Galileo free tier.
-5. **Later — this repo**: retire `harness/promptstack/` once P1 covers all
-   four probe classes.
+5. **Completed — this repo**: retired the custom `promptstack` runner while
+   retaining `--kind promptstack` for historical shards.

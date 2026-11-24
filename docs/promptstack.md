@@ -1,11 +1,11 @@
 # promptstack suite — system prompt as the independent variable
 
-> **Superseded.** Prompt evaluation is moving to the promptfoo-based
+> **Retired.** Prompt evaluation moved to the promptfoo-based
 > `dryvist/llm-prompt-evals` repo — see
 > [`prompt-eval-framework.md`](prompt-eval-framework.md) for the decision
-> record and migration path. promptstack remains runnable and its published
-> shards stay valid history in the dataset, but new prompt A/B work should
-> start in `llm-prompt-evals`. Its probe banks migrate there as test datasets.
+> record and migration path. The custom runner and configs have been retired
+> from this repository while published promptstack shards and the
+> `--kind promptstack` converter remain intact for historical dataset records.
 
 Every other suite in this repo holds the system prompt fixed and varies the
 model. `promptstack` does the opposite: it holds the **model** fixed and
@@ -14,14 +14,12 @@ base plus a surface's identity/tools delta) vs. `current` (whatever that
 surface runs today). This is what decides whether a prompt-surface change
 gets adopted.
 
-Runner: [`harness/promptstack/run.py`](../harness/promptstack/run.py) — a
-standalone PEP 723 script (`uv run` resolves its only dependency, httpx). It
-targets any OpenAI-compatible `/v1` endpoint, same as `agentic`.
+Converter: [`src/mlx_benchmarks/converters/promptstack.py`](../src/mlx_benchmarks/converters/promptstack.py)
+(retained for historical raw JSON conversions; the standalone runner was retired).
 
 ## What it measures
 
-Four deterministic probe classes, each a small frozen task bank under
-[`configs/promptstack/probes/`](../configs/promptstack/probes/):
+Four deterministic probe classes, originally stored as frozen task banks:
 
 | Probe class | Measures | Scoring |
 | --- | --- | --- |
@@ -45,24 +43,11 @@ Per probe class, per cell, the runner reports `task_success_rate`, class-specifi
 extras (`valid_tool_call_rate`, `unsupported_claim_rate`, `instruction_adherence_rate`),
 average prompt/completion tokens, and latency p50/p95.
 
-## Running
+## Historical invocation and publishing
 
-```bash
-uv run harness/promptstack/run.py \
-  --base-url http://localhost:11434/v1 \
-  --api-key-env OPENAI_API_KEY \
-  --model mlx-community/Qwen3.6-35B-A3B-4bit \
-  --prompt-set configs/promptstack/prompts/ \
-  --probe-bank configs/promptstack/probes/ \
-  --surface hermes
-```
-
-`--surface` selects which prompt pair to compare: `configs/promptstack/prompts/<surface>.txt`
-(base + variant) against `configs/promptstack/prompts/current-<surface>.txt`
-(today's prompt for that surface). Add a new surface by adding both files —
-no code change needed.
-
-Publish with:
+Historically, the retired `promptstack` runner targeted OpenAI-compatible `/v1`
+endpoints per surface (`<surface>.txt` vs `current-<surface>.txt`). Existing raw
+outputs still publish with:
 
 ```bash
 mlx-bench-publish run-output/promptstack_<slug>.json \

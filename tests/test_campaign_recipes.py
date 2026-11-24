@@ -275,13 +275,16 @@ def test_mmlu_pro_reasoning_effort_recipe_runs_fixed_seeded_generative_arms() ->
 
 def test_llama_cpp_throughput_recipe_matches_the_headline_cell_shape() -> None:
     (run,) = RECIPES["llama-cpp/throughput"]["run"]
+    assert run["executable"] == "gbench"
     assert run["output_tokens"] == 512
     assert run["repetitions"] == 1
     assert run["dimensions"] == ["context_list", "concurrency_list"]
     assert {25, 65536} <= set(RECIPES["llama-cpp/throughput"]["context_list"])
-    assert _argument_after(run, "--target-prompt-tokens") == "{{ context }}"
-    assert _argument_after(run, "--max-tokens") == "{{ output_tokens }}"
-    assert _argument_after(run, "--repeats") == "4"
+    assert "--serving-only" in run["argv"]
+    assert _argument_after(run, "--input-lengths") == "{{ context }}"
+    assert _argument_after(run, "--output-lengths") == "{{ output_tokens }}"
+    assert _argument_after(run, "--batch-sizes") == "{{ concurrency }}"
+    assert run["converter"]["kind"] == "gbench"
 
 
 def test_llama_cpp_fixed_length_recipe_uses_the_native_vllm_chat_client() -> None:
@@ -308,11 +311,13 @@ def test_strata_throughput_recipe_matches_the_batch_campaign_shape() -> None:
         (4096, 1024),
     ]
     for run in recipe["run"]:
+        assert run["executable"] == "gbench"
         assert run["dimensions"] == ["concurrency_list"]
-        assert _argument_after(run, "--base-url") == "{{ benchmark_endpoint }}"
-        assert _argument_after(run, "--target-prompt-tokens") == "{{ context }}"
-        assert _argument_after(run, "--max-tokens") == "{{ output_tokens }}"
-        assert run["converter"]["kind"] == "throughput-probe"
+        assert "--serving-only" in run["argv"]
+        assert _argument_after(run, "--remote-endpoint") == "{{ benchmark_endpoint }}"
+        assert _argument_after(run, "--input-lengths") == "{{ context }}"
+        assert _argument_after(run, "--output-lengths") == "{{ output_tokens }}"
+        assert run["converter"]["kind"] == "gbench"
 
 
 @pytest.mark.parametrize("name", sorted(RECIPES))

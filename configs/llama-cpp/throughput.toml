@@ -8,23 +8,25 @@ power_cap_w = "inventory"
 
 [[run]]
 name = "serving-throughput"
-executable = "uv"
+executable = "gbench"
 argv = [
-  "run", "harness/throughput/run.py",
-  "--base-url", "{{ benchmark_endpoint }}",
-  "--model", "{{ model_id }}",
-  "--target-prompt-tokens", "{{ context }}",
-  "--window-limit-tokens", "{{ context_window_tokens }}",
-  "--max-tokens", "{{ output_tokens }}",
-  "--repeats", "4",
-  "--concurrency", "{{ concurrency }}",
-  "--initial-model-state", "resident",
-  "--output", "{{ result_path }}",
+  "--remote-endpoint", "{{ benchmark_endpoint }}",
+  "--models", "{{ model_id }}",
+  "--served-model-id", "{{ serving_model }}",
+  "--tokenizer", "{{ model_id }}",
+  "--serving-only",
+  "--text-only",
+  "--batch-sizes", "{{ concurrency }}",
+  "--input-lengths", "{{ context }}",
+  "--output-lengths", "{{ output_tokens }}",
+  "--num-iterations", "1",
+  "--results-dir", "{{ output_path }}",
 ]
 dimensions = ["context_list", "concurrency_list"]
 repetitions = 1
 artifact_id = "selected_model"
 run_on = "controller"
-capture_stdout = true
-converter = { executable = "mlx-bench-publish", kind = "throughput-probe", suite = "throughput", run_on = "controller" }
+capture_stdout = false
+converter = { executable = "mlx-bench-publish", kind = "gbench", suite = "throughput", run_on = "controller" }
 output_tokens = 512
+api_key_env = "OPENAI_API_KEY"

@@ -45,12 +45,12 @@ swap-in. Match the family exactly:
 
 ## Traps checklist
 
-### Trap 1: coding overlay is mandatory
+### Trap 1: plain coding extractors misfire on chat output
 
-Plain `humaneval`/`mbpp` score ~0 on chat-served models (the extractor grabs the
-echoed prompt). Use `--include_path configs/lm-eval/qwen3-tasks --tasks
-humaneval_instruct_qwen3,mbpp_instruct_qwen3 --confirm_run_unsafe_code
---log_samples`, with `HF_ALLOW_CODE_EVAL=1`.
+Plain `lm-eval` `humaneval`/`mbpp` score ~0 on chat-served models (the upstream
+extractor grabs the echoed prompt instead of fenced Python blocks). Prefer
+`gbench --evals-only --evals lcb bigcodebench` (`--kind gbench`) or
+`evalscope/livecodebench` for chat-served coding models.
 
 ### Trap 2: read math_verify
 

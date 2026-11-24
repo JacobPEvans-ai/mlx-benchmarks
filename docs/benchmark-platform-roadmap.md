@@ -51,8 +51,7 @@ left or right columns without a demonstrated gap in the adopted tools.
   suite runners; retain only required converters and provenance.
 - **Prompt and factual regression:** follow the adopted
   [prompt-eval framework](prompt-eval-framework.md) and use
-  [Promptfoo](https://www.promptfoo.dev/). Retire `promptstack` only after all
-  four probe classes are covered there.
+  [Promptfoo](https://www.promptfoo.dev/) (`promptstack` runner retired; historical converter retained).
 - **Self-hosted traces and experiment review:** use
   [Langfuse](https://langfuse.com/) when available, while retaining the
   canonical public benchmark dataset.
