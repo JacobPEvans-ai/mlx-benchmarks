@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.79.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.78.0...v0.79.0) (2026-11-26)
+
+
+### Features
+
+* **configs:** add a gbench nightly campaign recipe ([#543](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/543)) ([4486af4](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/4486af4a0431f431d339cd59050d33534c6607b3))
+
 ## [0.78.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.77.0...v0.78.0) (2026-11-26)
 
 
