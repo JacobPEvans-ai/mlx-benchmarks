@@ -66,6 +66,8 @@ target's inventory facts so the envelope describes the benchmark target.
   samples with OFF, LOW, and XHIGH reasoning arms at concurrency one.
 - `gbench/golden-smoke` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): deterministic
   `gbench --golden-only` smoke check over OpenAI-compatible chat endpoints.
+- `gbench/nightly` (`llama_cpp`, `vllm`, `mlx_lm`): the scheduled campaign recipe;
+  the `gbench --golden-only` smoke check plus the quick MMLU-Pro leaderboard slice.
 - `gbench/stress-agentic` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): open-loop
   `gbench --stress-test --campaign agentic` capacity-under-SLO sweep.
 - `gbench/capability-unsat` (`llama_cpp`, `vllm`, `mlx_lm`, `vllm_mlx`): deterministic

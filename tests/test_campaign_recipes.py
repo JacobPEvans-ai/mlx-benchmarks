@@ -50,9 +50,6 @@ LONG_CONTEXT_RECIPES = EXPECTED - {
     "evalscope/mmlu-pro-reasoning-effort",
     "gbench/golden-smoke",
 }
-# gbench/nightly composes the documented golden-smoke and quick-intelligence
-# recipes for the scheduled campaign rail; it adds no new suite to the doc.
-DOC_LISTED_RECIPES = EXPECTED - {"gbench/nightly"}
 ENGINES = {"llama_cpp", "vllm", "mlx_lm", "mlx_vlm_native", "vllm_mlx", "strata"}
 AGENT_COUNTS = {1, 2, 4, 8}
 LONG_CONTEXT_TOKENS = 131072
@@ -324,7 +321,7 @@ def test_strata_throughput_recipe_matches_the_batch_campaign_shape() -> None:
         assert run["converter"]["kind"] == "gbench"
 
 
-@pytest.mark.parametrize("name", sorted(DOC_LISTED_RECIPES))
+@pytest.mark.parametrize("name", sorted(RECIPES))
 def test_recipe_is_listed_in_the_target_inputs_doc(name: str) -> None:
     assert f"`{name}`" in TARGET_INPUTS_DOC.read_text()
 
