@@ -40,6 +40,7 @@ EXPECTED = {
     "evalscope/livecodebench",
     "evalscope/mmlu-pro-reasoning-effort",
     "gbench/golden-smoke",
+    "gbench/nightly",
     "gbench/stress-agentic",
     "gbench/capability-unsat",
 }
@@ -49,6 +50,9 @@ LONG_CONTEXT_RECIPES = EXPECTED - {
     "evalscope/mmlu-pro-reasoning-effort",
     "gbench/golden-smoke",
 }
+# gbench/nightly composes the documented golden-smoke and quick-intelligence
+# recipes for the scheduled campaign rail; it adds no new suite to the doc.
+DOC_LISTED_RECIPES = EXPECTED - {"gbench/nightly"}
 ENGINES = {"llama_cpp", "vllm", "mlx_lm", "mlx_vlm_native", "vllm_mlx", "strata"}
 AGENT_COUNTS = {1, 2, 4, 8}
 LONG_CONTEXT_TOKENS = 131072
@@ -320,7 +324,7 @@ def test_strata_throughput_recipe_matches_the_batch_campaign_shape() -> None:
         assert run["converter"]["kind"] == "gbench"
 
 
-@pytest.mark.parametrize("name", sorted(RECIPES))
+@pytest.mark.parametrize("name", sorted(DOC_LISTED_RECIPES))
 def test_recipe_is_listed_in_the_target_inputs_doc(name: str) -> None:
     assert f"`{name}`" in TARGET_INPUTS_DOC.read_text()
 
@@ -364,3 +368,17 @@ def test_gbench_recipes_use_remote_endpoint_without_gemini_judge() -> None:
     cap_run = RECIPES["gbench/capability-unsat"]["run"][0]
     assert "--evals-only" in cap_run["argv"]
     assert cap_run["dimensions"] == ["concurrency_list"]
+
+
+def test_nightly_campaign_copies_the_golden_and_quick_intelligence_runs() -> None:
+    """The scheduled rail reuses the two documented run tables verbatim."""
+    nightly = tomllib.loads((CONFIGS / "gbench" / "nightly.toml").read_text())
+    assert nightly["config_name"] == "gbench/nightly"
+    sources = {}
+    for path in ("gbench/golden-smoke.toml", "lm-eval/quick-intelligence.toml"):
+        for run in tomllib.loads((CONFIGS / path).read_text())["run"]:
+            sources[run["name"]] = run
+    assert [run["name"] for run in nightly["run"]] == ["gbench-golden", "mmlu-pro-quick"]
+    assert "gbench-stress-agentic" not in {run["name"] for run in nightly["run"]}
+    for run in nightly["run"]:
+        assert run == sources[run["name"]]
