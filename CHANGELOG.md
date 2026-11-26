@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.78.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.77.0...v0.78.0) (2026-11-26)
+
+
+### Features
+
+* **agent:** zcode run j-78bf19d6c86439c9 ([a69aee2](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/a69aee254f6bd4881e6e5f5589be6f0098562d40))
+* **configs:** add a gbench nightly campaign recipe ([#544](https://github.com/JacobPEvans-ai/mlx-benchmarks/issues/544)) ([a69aee2](https://github.com/JacobPEvans-ai/mlx-benchmarks/commit/a69aee254f6bd4881e6e5f5589be6f0098562d40))
+
 ## [0.77.0](https://github.com/JacobPEvans-ai/mlx-benchmarks/compare/v0.76.0...v0.77.0) (2026-11-24)
 
 
