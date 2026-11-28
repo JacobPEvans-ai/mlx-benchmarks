@@ -20,7 +20,7 @@ repos:
         args: [--fix=lf]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.5
+    rev: v0.17.6
     hooks:
       # `ruff-check` is the current lint hook id; bare `ruff` is a legacy alias.
       - id: ruff-check
